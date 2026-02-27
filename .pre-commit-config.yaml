@@ -1,0 +1,31 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace      # Removes stray spaces at the end of lines
+      - id: end-of-file-fixer        # Ensures files end with a newline
+      - id: check-yaml               # Validates your YAML syntax
+      - id: check-added-large-files  # Prevents you from accidentally committing a 50MB log file
+      - id: check-shebang-scripts-are-executable # Ensures your .sh files actually have chmod +x
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.9.0
+    hooks:
+      - id: ruff
+        args: [ --fix ]
+      - id: ruff-format
+
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy
+        entry: mypy
+        language: system
+        types: [python]
+        # Only run on files you're actually committing
+        pass_filenames: true
+
+  - repo: https://github.com/koalaman/shellcheck-precommit
+    rev: v0.10.0
+    hooks:
+      - id: shellcheck

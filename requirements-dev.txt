@@ -1,0 +1,13 @@
+-r requirements.txt
+
+# Linting & Formatting
+ruff
+
+# Type Checking
+mypy
+
+# Add type stubs for your specific libraries if they don't have them built-in
+types-requests
+
+# Git Hooks
+pre-commit

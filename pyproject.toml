@@ -1,0 +1,39 @@
+[project]
+name = "achterhus-server-tools"
+requires-python = ">=3.12"
+
+[tool.ruff]
+# How long you want your lines to be before they wrap
+line-length = 80
+target-version = "py312"
+
+[tool.ruff.lint]
+# E/F = Defaults, I = Isort (imports), N = Pep8-naming, UP = PyUpgrade
+select = ["E", "F", "I", "N", "UP"]
+fixable = ["ALL"]
+
+[tool.ruff.format]
+# Use "double" or "single" quotes based on your preference
+quote-style = "double"
+
+# Ensures a trailing comma in multi-line lists/dicts (better for git diffs)
+skip-magic-trailing-comma = false
+
+# This handles the indent style (usually 4 spaces)
+indent-style = "space"
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+# This helps mypy find types within your venv
+ignore_missing_imports = false
+# Common strict flags
+disallow_untyped_defs = true
+check_untyped_defs = true
+warn_return_any = true
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+# For libraries that don't have type hints, ignore their missing stubs
+module = ["some_untyped_lib.*"]
+ignore_missing_imports = true
