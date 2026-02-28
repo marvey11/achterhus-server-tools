@@ -1,0 +1,71 @@
+#! /usr/bin/env python3
+
+import argparse
+import json
+import sys
+from datetime import UTC, datetime
+from pathlib import Path
+
+# Allow running from the bin directory without setting PYTHONPATH
+if __name__ == "__main__" and __package__ is None:
+    sys.path.append(str(Path(__file__).resolve().parent.parent))
+
+from lib.configuration import Configuration
+
+
+def report_status(service_name: str, exit_code: int) -> None:
+    project_root = Path(__file__).resolve().parent.parent
+    json_env_file = project_root / ".env.json"
+
+    try:
+        config = Configuration.from_json(json_env_file)
+    except (json.JSONDecodeError, ValueError):
+        print(
+            f"❌ Error: {json_env_file.name} is not valid JSON configuration.",
+            file=sys.stderr,
+        )
+        return
+
+    user_home = Path.home()
+    status_dir = (
+        user_home / config.get("status-dir", ".cache/achterhus/status")
+    ).resolve()
+
+    # Ensure the status directory exists
+    status_dir.mkdir(parents=True, exist_ok=True)
+
+    utc_now = (
+        datetime.now(UTC)
+        .replace(tzinfo=None)
+        .isoformat(timespec="milliseconds")
+        + "Z"
+    )
+
+    data = {
+        "service": service_name,
+        "timestamp": utc_now,
+        "status": "success" if exit_code == 0 else "error",
+        "exit_code": exit_code,
+    }
+
+    status_file = status_dir / f"{service_name}.json"
+    try:
+        with open(status_file, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=4)
+    except OSError as e:
+        print(f"❌ Error writing status file: {e}", file=sys.stderr)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Report service status to a JSON file."
+    )
+    parser.add_argument("service_name", help="Name of the service")
+    parser.add_argument("exit_code", type=int, help="Exit code of the service")
+
+    args = parser.parse_args()
+    report_status(args.service_name, args.exit_code)
+
+
+if __name__ == "__main__":
+    main()
