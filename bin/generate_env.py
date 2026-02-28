@@ -22,6 +22,12 @@ def main() -> None:
         )
         sys.exit(1)
 
+    try:
+        config.validate(["status-dir", "photo-inbox", "storage-dir"])
+    except ValueError as e:
+        print(f"❌ Configuration error: {e}", file=sys.stderr)
+        sys.exit(1)
+
     # Define configuration keys and their default values.
     status_dir = config.get("status-dir", ".cache/achterhus/status")
     photo_inbox = config.get("photo-inbox", "photo-inbox")

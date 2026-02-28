@@ -26,10 +26,14 @@ def report_status(service_name: str, exit_code: int) -> None:
         )
         return
 
+    try:
+        config.validate(["status-dir"])
+    except ValueError as e:
+        print(f"❌ Configuration error: {e}", file=sys.stderr)
+        sys.exit(1)
+
     user_home = Path.home()
-    status_dir = (
-        user_home / config.get("status-dir", ".cache/achterhus/status")
-    ).resolve()
+    status_dir = config.get_path("status-dir", user_home)
 
     # Ensure the status directory exists
     status_dir.mkdir(parents=True, exist_ok=True)
@@ -52,6 +56,9 @@ def report_status(service_name: str, exit_code: int) -> None:
     try:
         with open(status_file, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=4)
+            # Ensure file ends with a newline for better readability
+            f.write("\n")
+
     except OSError as e:
         print(f"❌ Error writing status file: {e}", file=sys.stderr)
 

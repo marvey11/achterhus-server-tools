@@ -48,3 +48,26 @@ class Configuration:
     def items(self) -> ItemsView[str, str]:
         """Returns the key-value pairs in the configuration."""
         return self._config.items()
+
+    def validate(self, required_keys: list[str]) -> None:
+        """
+        Ensures all required keys are present.
+        Raises ValueError with a helpful message if any are missing.
+        """
+        missing = [key for key in required_keys if key not in self._config]
+        if missing:
+            raise ValueError(
+                f"❌ Missing required configuration keys: {', '.join(missing)}"
+            )
+
+    def get_path(self, key: str, base_path: Path | None = None) -> Path:
+        """
+        Returns a resolved Path. If the config value is relative,
+        it is joined with base_path (defaults to current dir).
+        """
+        val = Path(self.get(key))
+        if val.is_absolute():
+            return val.resolve()
+
+        base = base_path or Path.cwd()
+        return (base / val).resolve()
