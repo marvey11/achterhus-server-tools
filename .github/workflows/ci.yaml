@@ -32,3 +32,10 @@ jobs:
         run: |
           export PYTHONPATH=$PYTHONPATH:.
           mypy .
+
+      - name: Run ShellCheck
+        run: |
+          sudo apt-get install -y shellcheck
+          # create a dummy .env so shellcheck can "follow" the source command
+          touch .env
+          shellcheck bin/*.sh
