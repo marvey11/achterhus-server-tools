@@ -6,6 +6,7 @@ requires-python = ">=3.12"
 # How long you want your lines to be before they wrap
 line-length = 80
 target-version = "py312"
+src = ["."]
 
 [tool.ruff.lint]
 # E/F = Defaults, I = Isort (imports), N = Pep8-naming, UP = PyUpgrade
@@ -24,7 +25,9 @@ indent-style = "space"
 
 [tool.mypy]
 python_version = "3.12"
+mypy_path = "."
 strict = true
+explicit_package_bases = true
 # This helps mypy find types within your venv
 ignore_missing_imports = false
 # Common strict flags
