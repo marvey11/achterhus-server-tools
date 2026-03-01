@@ -6,15 +6,15 @@ import sys
 from datetime import UTC, datetime
 from pathlib import Path
 
-# Allow running from the bin directory without setting PYTHONPATH
-if __name__ == "__main__" and __package__ is None:
-    sys.path.append(str(Path(__file__).resolve().parent.parent))
+# Add the project root to sys.path
+project_root = Path(__file__).resolve().parent.parent
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
 
 from lib.configuration import Configuration
 
 
 def report_status(service_name: str, exit_code: int) -> None:
-    project_root = Path(__file__).resolve().parent.parent
     json_env_file = project_root / ".env.json"
 
     try:
@@ -26,10 +26,14 @@ def report_status(service_name: str, exit_code: int) -> None:
         )
         return
 
+    try:
+        config.validate(["status-dir"])
+    except ValueError as e:
+        print(f"❌ Configuration error: {e}", file=sys.stderr)
+        sys.exit(1)
+
     user_home = Path.home()
-    status_dir = (
-        user_home / config.get("status-dir", ".cache/achterhus/status")
-    ).resolve()
+    status_dir = config.get_path("status-dir", user_home)
 
     # Ensure the status directory exists
     status_dir.mkdir(parents=True, exist_ok=True)
@@ -52,6 +56,9 @@ def report_status(service_name: str, exit_code: int) -> None:
     try:
         with open(status_file, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=4)
+            # Ensure file ends with a newline for better readability
+            f.write("\n")
+
     except OSError as e:
         print(f"❌ Error writing status file: {e}", file=sys.stderr)
 
