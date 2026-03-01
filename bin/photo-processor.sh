@@ -21,12 +21,21 @@ function finish() {
 
 trap finish EXIT INT TERM
 
+# Locate the virtual environment relative to the script
+VENV_PYTHON="${SCRIPT_DIR}/../.env/bin/python3"
+
+# Use the venv if it exists, otherwise fallback to system python
+PYTHON_CMD="${VENV_PYTHON}"
+if [ ! -f "$VENV_PYTHON" ]; then
+    PYTHON_CMD="python3"
+fi
+
 ENV_FILE="${SCRIPT_DIR}/../.env"
 
 # Ensure generate_env.py is called correctly
 if [ ! -f "$ENV_FILE" ]; then
     echo "⚠️ .env not found, attempting to generate..."
-    python3 "${SCRIPT_DIR}/generate_env.py" || {
+    ${PYTHON_CMD} "${SCRIPT_DIR}/generate_env.py" || {
         echo "❌ Failed to generate .env file."
         exit 1
     }

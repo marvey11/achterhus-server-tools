@@ -1,0 +1,15 @@
+[Unit]
+Description=Run Photo Processor every 6 hours
+
+[Timer]
+# Run 15 minutes after boot
+OnBootSec=15min
+# Run every 6 hours thereafter
+OnUnitActiveSec=6h
+# Ensure it doesn't run at the exact same second as other tasks
+RandomizedDelaySec=5min
+# Run if the last scheduled time was missed (e.g. PC was off)
+Persistent=true
+
+[Install]
+WantedBy=default.target

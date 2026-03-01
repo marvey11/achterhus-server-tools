@@ -1,0 +1,15 @@
+[Unit]
+Description=Automated Photo Processor
+After=network.target
+
+[Service]
+Type=oneshot
+WorkingDirectory={{PROJECT_ROOT}}
+ExecStart={{PROJECT_ROOT}}/bin/photo-processor.sh
+
+# can't use variables from the config here, but substitutions still work...
+StandardOutput=append:%h/.achterhus/log/%N.log
+StandardError=append:%h/.achterhus/log/%N.log
+
+[Install]
+WantedBy=default.target

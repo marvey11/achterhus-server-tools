@@ -4,11 +4,16 @@ import json
 import sys
 from pathlib import Path
 
+# Add the project root to sys.path
+project_root = Path(__file__).resolve().parent.parent
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
+
+
 from lib.configuration import Configuration
 
 
 def main() -> None:
-    project_root = Path(__file__).resolve().parent.parent
     json_env_file = project_root / ".env.json"
 
     user_home = Path.home()
@@ -23,21 +28,21 @@ def main() -> None:
         sys.exit(1)
 
     try:
-        config.validate(["status-dir", "photo-inbox", "storage-dir"])
+        config.validate(["photo-inbox", "status-dir", "storage-dir"])
     except ValueError as e:
         print(f"❌ Configuration error: {e}", file=sys.stderr)
         sys.exit(1)
 
     # Define configuration keys and their default values.
-    status_dir = config.get("status-dir", ".cache/achterhus/status")
-    photo_inbox = config.get("photo-inbox", "photo-inbox")
-    storage_dir = config.get("storage-dir", str(user_home))
+    status_dir = config.get_path("status-dir", user_home)
+    photo_inbox = config.get_path("photo-inbox", user_home)
+    storage_dir = config.get_path("storage-dir")
 
     # Construct the final environment variables. Using resolve() ensures all
     # paths are absolute and unambiguous.
     env_config = {
-        "SERVICE_STATUS_DIR": (user_home / status_dir).resolve(),
-        "PHOTO_INBOX": (user_home / photo_inbox).resolve(),
+        "SERVICE_STATUS_DIR": status_dir,
+        "PHOTO_INBOX": photo_inbox,
         "PHOTO_STORAGE": (Path(storage_dir) / "photo").resolve(),
     }
 

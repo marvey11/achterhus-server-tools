@@ -57,7 +57,7 @@ class Configuration:
         missing = [key for key in required_keys if key not in self._config]
         if missing:
             raise ValueError(
-                f"❌ Missing required configuration keys: {', '.join(missing)}"
+                f"Missing required configuration keys: {', '.join(missing)}"
             )
 
     def get_path(self, key: str, base_path: Path | None = None) -> Path:

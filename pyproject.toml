@@ -13,6 +13,10 @@ src = ["."]
 select = ["E", "F", "I", "N", "UP"]
 fixable = ["ALL"]
 
+[tool.ruff.lint.per-file-ignores]
+# Ignore "Module level import not at top of file" only for scripts in bin/
+"bin/*.py" = ["E402"]
+
 [tool.ruff.format]
 # Use "double" or "single" quotes based on your preference
 quote-style = "double"

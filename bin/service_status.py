@@ -6,15 +6,15 @@ import sys
 from datetime import UTC, datetime
 from pathlib import Path
 
-# Allow running from the bin directory without setting PYTHONPATH
-if __name__ == "__main__" and __package__ is None:
-    sys.path.append(str(Path(__file__).resolve().parent.parent))
+# Add the project root to sys.path
+project_root = Path(__file__).resolve().parent.parent
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
 
 from lib.configuration import Configuration
 
 
 def report_status(service_name: str, exit_code: int) -> None:
-    project_root = Path(__file__).resolve().parent.parent
     json_env_file = project_root / ".env.json"
 
     try:
