@@ -28,6 +28,7 @@ def main() -> None:
         sys.exit(1)
 
     try:
+        config.check_version()
         config.validate(["photo-inbox", "status-dir", "storage-dir"])
     except ValueError as e:
         print(f"❌ Configuration error: {e}", file=sys.stderr)

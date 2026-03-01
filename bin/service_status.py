@@ -27,6 +27,7 @@ def get_status_dir() -> Path | None:
         return None
 
     try:
+        config.check_version()
         config.validate(["status-dir"])
     except ValueError as e:
         print(f"❌ Configuration error: {e}", file=sys.stderr)
