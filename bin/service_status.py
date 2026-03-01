@@ -14,7 +14,7 @@ if str(project_root) not in sys.path:
 from lib.configuration import Configuration
 
 
-def report_status(service_name: str, exit_code: int) -> None:
+def get_status_dir() -> Path | None:
     json_env_file = project_root / ".env.json"
 
     try:
@@ -24,7 +24,7 @@ def report_status(service_name: str, exit_code: int) -> None:
             f"❌ Error: {json_env_file.name} is not valid JSON configuration.",
             file=sys.stderr,
         )
-        return
+        return None
 
     try:
         config.validate(["status-dir"])
@@ -38,6 +38,10 @@ def report_status(service_name: str, exit_code: int) -> None:
     # Ensure the status directory exists
     status_dir.mkdir(parents=True, exist_ok=True)
 
+    return status_dir
+
+
+def report_status(status_dir: Path, service_name: str, exit_code: int) -> None:
     utc_now = (
         datetime.now(UTC)
         .replace(tzinfo=None)
@@ -63,6 +67,28 @@ def report_status(service_name: str, exit_code: int) -> None:
         print(f"❌ Error writing status file: {e}", file=sys.stderr)
 
 
+def update_manifest(status_dir: Path, service_name: str) -> None:
+    manifest_file = status_dir / "services.json"
+
+    services: set[str] = set()
+
+    if manifest_file.exists():
+        try:
+            with open(manifest_file, encoding="utf-8") as f:
+                services = set(json.load(f))
+        except json.JSONDecodeError:
+            pass
+
+    if service_name not in services:
+        services.add(service_name)
+        temp_file = manifest_file.with_suffix(".tmp")
+        with open(temp_file, "w", encoding="utf-8") as f:
+            json.dump(sorted(list(services)), f, indent=2)
+
+        temp_file.replace(manifest_file)
+        manifest_file.chmod(0o644)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Report service status to a JSON file."
@@ -70,8 +96,13 @@ def main() -> None:
     parser.add_argument("service_name", help="Name of the service")
     parser.add_argument("exit_code", type=int, help="Exit code of the service")
 
+    status_dir = get_status_dir()
+    if status_dir is None:
+        sys.exit(1)
+
     args = parser.parse_args()
-    report_status(args.service_name, args.exit_code)
+    report_status(status_dir, args.service_name, args.exit_code)
+    update_manifest(status_dir, args.service_name)
 
 
 if __name__ == "__main__":
