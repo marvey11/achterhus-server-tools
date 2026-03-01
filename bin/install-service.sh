@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -eu
+set -euo pipefail
 
 if [ "$#" -ne 1 ]; then
     echo "❌ Usage: $0 <service-name>"
@@ -9,7 +9,13 @@ fi
 
 SERVICE_NAME="$1"
 
-PROJECT_ROOT=$(pwd)
+SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
+PROJECT_ROOT=$(realpath "${SCRIPT_DIR}/..")
+
+# Discover Python (venv vs system)
+PYTHON_CMD="${PROJECT_ROOT}/.venv/bin/python3"
+if [ ! -f "$PYTHON_CMD" ]; then PYTHON_CMD="python3"; fi
+
 SYSTEMD_DIR="${HOME}/.config/systemd/user"
 mkdir -p "${SYSTEMD_DIR}"
 
@@ -17,7 +23,7 @@ echo "🔧 Configuring systemd units for: ${PROJECT_ROOT}"
 
 # Generate the initial .env file via the Python service framework
 export PYTHONPATH="${PROJECT_ROOT}:${PYTHONPATH:-}"
-python3 bin/generate_env.py
+${PYTHON_CMD} bin/generate_env.py
 
 # Process the Service template
 SERVICE_TEMPLATE="systemd/${SERVICE_NAME}.service.template"
@@ -40,7 +46,7 @@ systemctl --user enable --now "${SERVICE_NAME}.timer"
 echo "⏰ Timer enabled: ${SERVICE_NAME}.timer"
 
 echo "🔍 Performing sanity check on ${SERVICE_NAME}..."
-# Ask Systemd to verify the unit file syntax
+# Ask systemd to verify the unit file syntax
 systemd-analyze verify "${SYSTEMD_DIR}/${SERVICE_NAME}.service"
 
 echo "✅ Installation complete!"

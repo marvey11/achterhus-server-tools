@@ -44,3 +44,7 @@ warn_unused_ignores = true
 # For libraries that don't have type hints, ignore their missing stubs
 module = ["some_untyped_lib.*"]
 ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
