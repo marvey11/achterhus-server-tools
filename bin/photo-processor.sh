@@ -3,6 +3,7 @@
 set -euo pipefail
 
 SERVICE_NAME="photo-processor"
+METADATA="{}" # Default to empty JSON object
 
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 PROJECT_ROOT=$(realpath "${SCRIPT_DIR}/..")
@@ -15,7 +16,10 @@ if [ ! -f "$PYTHON_CMD" ]; then PYTHON_CMD="python3"; fi
 function finish() {
     local exit_code=$?
 
-    ${PYTHON_CMD} "${SCRIPT_DIR}/service_status.py" "${SERVICE_NAME}" "$exit_code"
+    ${PYTHON_CMD} "${SCRIPT_DIR}/service_status.py" \
+        "${SERVICE_NAME}" \
+        "$exit_code" \
+        --metadata "$METADATA"
 
     if [ "$exit_code" -ne 0 ]; then
         echo "❌ Photo processing failed with exit code $exit_code."
@@ -58,8 +62,22 @@ echo "--- Photo Processing Started: $(date) ---"
 # the directive is for exiftool --> disable the warning for that line.
 
 # shellcheck disable=SC2016
-exiftool -P -ext jpg -ext jpeg -r -d "${PHOTO_STORAGE}/%Y" \
+LOG_OUTPUT=$(exiftool -P -ext jpg -ext jpeg -r -d "${PHOTO_STORAGE}/%Y" \
     '-Directory<${DateTimeOriginal}' \
-    "${PHOTO_INBOX}"
+    "${PHOTO_INBOX}")
+
+COUNT=$(echo "$LOG_OUTPUT" | grep "image files" | awk '{print $1}')
+COUNT=${COUNT:-0}
+
+METADATA=$(cat <<EOF
+{
+  "images": {
+    "label": "Processed",
+    "value": ${COUNT},
+    "unit": " images"
+  }
+}
+EOF
+)
 
 echo "--- Photo Processing Finished: $(date) ---"
