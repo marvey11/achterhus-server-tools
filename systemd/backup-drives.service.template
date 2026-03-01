@@ -1,0 +1,14 @@
+[Unit]
+Description=Daily Backup of the Storage Drive
+
+[Service]
+Type=oneshot
+WorkingDirectory={{PROJECT_ROOT}}
+ExecStart={{PROJECT_ROOT}}/bin/backup-drives.sh
+
+# can't use variables from the config here, but substitutions still work...
+StandardOutput=append:%h/.achterhus/log/%N.log
+StandardError=append:%h/.achterhus/log/%N.log
+
+[Install]
+WantedBy=default.target
