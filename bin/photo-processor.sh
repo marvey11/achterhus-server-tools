@@ -1,38 +1,32 @@
 #!/usr/bin/env bash
 
-# Use -e to exit immediately if a command exits with a non-zero status
-# Use -u to treat unset variables as an error
-set -eu
+set -euo pipefail
 
-SERVICE="photo-processor"
+SERVICE_NAME="photo-processor"
+
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
+PROJECT_ROOT=$(realpath "${SCRIPT_DIR}/..")
+
+# Discover Python (venv vs system)
+PYTHON_CMD="${PROJECT_ROOT}/.venv/bin/python3"
+if [ ! -f "$PYTHON_CMD" ]; then PYTHON_CMD="python3"; fi
+
 
 function finish() {
     local exit_code=$?
 
-    python3 "${SCRIPT_DIR}/service_status.py" "$SERVICE" "$exit_code"
+    ${PYTHON_CMD} "${SCRIPT_DIR}/service_status.py" "${SERVICE_NAME}" "$exit_code"
 
     if [ "$exit_code" -ne 0 ]; then
         echo "❌ Photo processing failed with exit code $exit_code."
-    else
-        echo "✅ Photo processing completed successfully."
     fi
 }
 
+
 trap finish EXIT INT TERM
 
-# Locate the virtual environment relative to the script
-VENV_PYTHON="${SCRIPT_DIR}/../.env/bin/python3"
+ENV_FILE="${PROJECT_ROOT}/.env"
 
-# Use the venv if it exists, otherwise fallback to system python
-PYTHON_CMD="${VENV_PYTHON}"
-if [ ! -f "$VENV_PYTHON" ]; then
-    PYTHON_CMD="python3"
-fi
-
-ENV_FILE="${SCRIPT_DIR}/../.env"
-
-# Ensure generate_env.py is called correctly
 if [ ! -f "$ENV_FILE" ]; then
     echo "⚠️ .env not found, attempting to generate..."
     ${PYTHON_CMD} "${SCRIPT_DIR}/generate_env.py" || {
@@ -44,7 +38,6 @@ fi
 # shellcheck source=/dev/null
 source "${ENV_FILE}"
 
-# Validation: ensure critical variables were actually loaded
 : "${PHOTO_INBOX:?Variable PHOTO_INBOX is not set or empty}"
 : "${PHOTO_STORAGE:?Variable PHOTO_STORAGE is not set or empty}"
 
