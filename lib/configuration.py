@@ -1,4 +1,5 @@
 import json
+import sys
 from collections.abc import ItemsView, KeysView
 from pathlib import Path
 from typing import Self
@@ -93,3 +94,25 @@ class Configuration:
 
         base = base_path or Path.cwd()
         return (base / path).resolve()
+
+
+def load_and_validate_config(
+    json_env_file: Path, expected_keys: list[str]
+) -> Configuration | None:
+    try:
+        config = Configuration.from_json(json_env_file)
+    except (json.JSONDecodeError, ValueError):
+        print(
+            f"❌ Error: {json_env_file.name} is not valid JSON configuration.",
+            file=sys.stderr,
+        )
+        return None
+
+    try:
+        config.check_version()
+        config.validate(expected_keys)
+    except ValueError as e:
+        print(f"❌ Configuration error: {e}", file=sys.stderr)
+        return None
+
+    return config

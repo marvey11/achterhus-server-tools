@@ -11,26 +11,14 @@ project_root = Path(__file__).resolve().parent.parent
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
-from lib.configuration import Configuration
+from lib.configuration import load_and_validate_config
 
 
-def get_status_dir() -> Path | None:
+def get_status_dir() -> Path:
     json_env_file = project_root / ".env.json"
 
-    try:
-        config = Configuration.from_json(json_env_file)
-    except (json.JSONDecodeError, ValueError):
-        print(
-            f"❌ Error: {json_env_file.name} is not valid JSON configuration.",
-            file=sys.stderr,
-        )
-        return None
-
-    try:
-        config.check_version()
-        config.validate(["status-dir"])
-    except ValueError as e:
-        print(f"❌ Configuration error: {e}", file=sys.stderr)
+    config = load_and_validate_config(json_env_file, ["status-dir"])
+    if config is None:
         sys.exit(1)
 
     user_home = Path.home()
@@ -98,8 +86,6 @@ def main() -> None:
     parser.add_argument("exit_code", type=int, help="Exit code of the service")
 
     status_dir = get_status_dir()
-    if status_dir is None:
-        sys.exit(1)
 
     args = parser.parse_args()
     report_status(status_dir, args.service_name, args.exit_code)

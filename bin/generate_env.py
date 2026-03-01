@@ -1,6 +1,5 @@
 #! /usr/bin/env python3
 
-import json
 import sys
 from pathlib import Path
 
@@ -10,29 +9,19 @@ if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
 
-from lib.configuration import Configuration
+from lib.configuration import load_and_validate_config
 
 
 def main() -> None:
     json_env_file = project_root / ".env.json"
 
+    config = load_and_validate_config(
+        json_env_file, ["photo-inbox", "status-dir", "storage-dir"]
+    )
+    if config is None:
+        sys.exit(1)
+
     user_home = Path.home()
-
-    try:
-        config = Configuration.from_json(json_env_file)
-    except (json.JSONDecodeError, ValueError):
-        print(
-            f"❌ Error: {json_env_file.name} is not valid JSON configuration.",
-            file=sys.stderr,
-        )
-        sys.exit(1)
-
-    try:
-        config.check_version()
-        config.validate(["photo-inbox", "status-dir", "storage-dir"])
-    except ValueError as e:
-        print(f"❌ Configuration error: {e}", file=sys.stderr)
-        sys.exit(1)
 
     # Define configuration keys and their default values.
     status_dir = config.get_path("status-dir", user_home)
