@@ -3,6 +3,8 @@ from collections.abc import ItemsView, KeysView
 from pathlib import Path
 from typing import Self
 
+type ConfigurationValue = str | int
+
 
 class Configuration:
     """Holds configuration values for the application."""
@@ -35,7 +37,7 @@ class Configuration:
 
     def __init__(self) -> None:
         """Initialize an empty configuration."""
-        self._config: dict[str, str | int] = {}
+        self._config: dict[str, ConfigurationValue] = {}
 
     def check_version(self) -> None:
         """
@@ -50,11 +52,13 @@ class Configuration:
                 f"Please update your .env.json."
             )
 
-    def set(self, key: str, value: str | int) -> None:
+    def set(self, key: str, value: ConfigurationValue) -> None:
         """Sets a configuration value."""
         self._config[key] = value
 
-    def get(self, key: str, default: str | int = "") -> str | int:
+    def get(
+        self, key: str, default: ConfigurationValue = ""
+    ) -> ConfigurationValue:
         """Gets a configuration value, returning default if not found."""
         return self._config.get(key, default)
 
@@ -62,7 +66,7 @@ class Configuration:
         """Returns the keys in the configuration."""
         return self._config.keys()
 
-    def items(self) -> ItemsView[str, str | int]:
+    def items(self) -> ItemsView[str, ConfigurationValue]:
         """Returns the key-value pairs in the configuration."""
         return self._config.items()
 
