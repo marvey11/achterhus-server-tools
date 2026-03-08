@@ -2,80 +2,113 @@ import json
 import sys
 from collections.abc import ItemsView, KeysView
 from pathlib import Path
-from typing import Self
+from typing import Any, Self
 
-type ConfigurationValue = str | int
+# Define a more descriptive type alias
+type ConfigurationValue = str | int | dict[str, Any]
 
 
 class Configuration:
-    """Holds configuration values for the application."""
+    """
+    Holds configuration values for the application with strict dependency
+    resolution.
+    """
 
-    # Increment whenever a breaking change to the JSON keys is introduced
-    SCHEMA_VERSION = 1
+    SCHEMA_VERSION = 2
 
     @classmethod
     def from_json(cls, json_path: Path) -> Self:
         """Loads configuration from a JSON file."""
-
         config = cls()
 
         if not json_path.exists():
-            print(f"⚠️  Note: {json_path.name} not found. Using defaults.")
+            print(
+                f"⚠️  Note: {json_path.name} not found. Using defaults.",
+                file=sys.stderr,
+            )
             return config
 
-        with open(json_path, encoding="utf-8") as f:
-            data = json.load(f)
+        try:
+            with open(json_path, encoding="utf-8") as f:
+                data = json.load(f)
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Failed to parse configuration JSON: {e}") from e
 
-            if not isinstance(data, dict):
-                raise ValueError("Root must be a dictionary")
+        if not isinstance(data, dict):
+            raise ValueError("Root of configuration JSON must be a dictionary")
 
-            for k, v in data.items():
-                key = str(k)
-                value = v if isinstance(v, str | int) else str(v)
-                config.set(key, value)
+        # Load raw data
+        for k, v in data.items():
+            config.set(str(k), v)
 
         return config
 
     def __init__(self) -> None:
-        """Initialize an empty configuration."""
         self._config: dict[str, ConfigurationValue] = {}
 
     def check_version(self) -> None:
-        """
-        Validates the 'version' key in the JSON.
-        Raises ValueError if version is missing or incompatible.
-        """
-        user_version = self.get("version", 0)
+        """Validates the 'version' key. Raises ValueError if incompatible."""
+        # Note: We use _get_raw to avoid resolution loops during version check
+        user_version = self._config.get("version", 0)
         if user_version != self.SCHEMA_VERSION:
             raise ValueError(
                 f"⚠️ Configuration version mismatch! "
-                f"Expected {self.SCHEMA_VERSION}, found {user_version}. "
-                f"Please update your .env.json."
+                f"Expected {self.SCHEMA_VERSION}, found {user_version}."
             )
 
     def set(self, key: str, value: ConfigurationValue) -> None:
-        """Sets a configuration value."""
         self._config[key] = value
 
-    def get(
-        self, key: str, default: ConfigurationValue = ""
-    ) -> ConfigurationValue:
-        """Gets a configuration value, returning default if not found."""
-        return self._config.get(key, default)
+    def get(self, key: str, default: Any = None) -> Any:
+        """
+        Gets a configuration value.
+        If key is missing and no default is provided, raises KeyError.
+        """
+        if key not in self._config:
+            if default is not None:
+                return default
+            raise KeyError(f"Configuration key '{key}' not found.")
 
-    def keys(self) -> KeysView[str]:
-        """Returns the keys in the configuration."""
-        return self._config.keys()
+        return self._resolve(self._config[key])
 
-    def items(self) -> ItemsView[str, ConfigurationValue]:
-        """Returns the key-value pairs in the configuration."""
-        return self._config.items()
+    def _resolve(self, value: Any) -> Any:
+        """
+        Recursively resolves configuration values.
+        Fails explicitly if referenced keys are missing.
+        """
+        if not isinstance(value, dict):
+            return value
+
+        val_type = value.get("type")
+        if not val_type:
+            return value
+
+        if val_type == "relative-path":
+            base_key_raw = value.get("base-path")
+            if not base_key_raw:
+                raise KeyError("Type 'relative-path' requires 'base-path'.")
+
+            base_key = base_key_raw.strip("{}")
+
+            # Check for the reserved "HOME" keyword
+            if base_key.upper() == "HOME":
+                base_path = Path.home()
+            else:
+                # Fall back to standard config lookup
+                try:
+                    base_path = Path(self.get(base_key))
+                except KeyError:
+                    raise KeyError(
+                        f"Reference '{base_key}' not found in config."
+                    )
+
+            sub_path = value.get("name", "")
+            return (base_path / sub_path).resolve()
+
+        return value
 
     def validate(self, required_keys: list[str]) -> None:
-        """
-        Ensures all required keys are present.
-        Raises ValueError with a helpful message if any are missing.
-        """
+        """Ensures all required keys are present."""
         missing = [key for key in required_keys if key not in self._config]
         if missing:
             raise ValueError(
@@ -83,17 +116,21 @@ class Configuration:
             )
 
     def get_path(self, key: str, base_path: Path | None = None) -> Path:
-        """
-        Returns a resolved Path. If the config value is relative,
-        it is joined with base_path (defaults to current dir).
-        """
-        value = str(self.get(key))
-        path = Path(value)
+        """Returns a resolved Path object."""
+        value = self.get(key)
+        path = Path(str(value))
+
         if path.is_absolute():
             return path.resolve()
 
-        base = base_path or Path.cwd()
+        base = base_path or Path.home()
         return (base / path).resolve()
+
+    def keys(self) -> KeysView[str]:
+        return self._config.keys()
+
+    def items(self) -> ItemsView[str, ConfigurationValue]:
+        return self._config.items()
 
 
 def load_and_validate_config(
