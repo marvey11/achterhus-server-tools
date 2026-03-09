@@ -1,6 +1,23 @@
 [project]
 name = "achterhus-server-tools"
+version = "0.1.0"
 requires-python = ">=3.12"
+dependencies = [
+    "jsonpath-ng",
+    "requests",
+]
+
+[project.optional-dependencies]
+dev = [
+    "mypy",
+    "ruff",
+    "pre-commit",
+    "types-requests",
+]
+
+[tool.setuptools.packages.find]
+include = ["lib*"]  # Only look for 'lib' or sub-packages within it
+namespaces = false   # Set to true if 'lib' doesn't have an __init__.py
 
 [tool.ruff]
 # How long you want your lines to be before they wrap
