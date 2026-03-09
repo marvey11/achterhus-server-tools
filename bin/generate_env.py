@@ -16,10 +16,11 @@ def main() -> None:
 
     # Define the keys we expect to exist in the JSON
     required_keys = [
-        "status-dir",
         "photo-inbox",
-        "storage-dir",
         "photo-storage",
+        "podcast-storage",
+        "status-dir",
+        "service-base-dir",
     ]
 
     config = load_and_validate_config(json_env_file, required_keys)
@@ -30,9 +31,11 @@ def main() -> None:
         # Mapping: BASH_VAR_NAME -> config_key (resolved)
         # Ensure Path objects are stringified correctly before quoting
         env_config = {
+            "SERVICE_BASE_DIR": str(config.get_path("service-base-dir")),
             "SERVICE_STATUS_DIR": str(config.get_path("status-dir")),
             "PHOTO_INBOX": str(config.get_path("photo-inbox")),
             "PHOTO_STORAGE": str(config.get("photo-storage")),
+            "PODCAST_STORAGE": str(config.get_path("podcast-storage")),
         }
     except KeyError as e:
         print(f"❌ Resolution Error: {e}", file=sys.stderr)

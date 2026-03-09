@@ -47,7 +47,7 @@ echo "⏰ Timer enabled: ${SERVICE_NAME}.timer"
 
 echo "🔍 Performing sanity check on ${SERVICE_NAME}..."
 # Ask systemd to verify the unit file syntax
-systemd-analyze verify "${SYSTEMD_DIR}/${SERVICE_NAME}.service"
+systemd-analyze verify --user "${SERVICE_NAME}.service"
 
 echo "✅ Installation complete!"
 echo "📡 Monitoring: systemctl --user status ${SERVICE_NAME}.timer"

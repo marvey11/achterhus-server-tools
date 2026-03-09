@@ -1,0 +1,14 @@
+[Unit]
+Description=Download Podcasts from ARD Audiothek
+
+[Service]
+Type=oneshot
+WorkingDirectory={{PROJECT_ROOT}}
+ExecStart={{PROJECT_ROOT}}/.venv/bin/python {{PROJECT_ROOT}}/bin/get_audiothek_postcasts.py
+
+# can't use variables from the config here, but substitutions still work...
+StandardOutput=append:%h/.achterhus/log/%N.log
+StandardError=append:%h/.achterhus/log/%N.log
+
+[Install]
+WantedBy=default.target
