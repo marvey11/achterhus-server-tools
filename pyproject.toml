@@ -12,6 +12,7 @@ dev = [
     "mypy",
     "ruff",
     "pre-commit",
+    "shellcheck-py",
     "types-requests",
 ]
 
