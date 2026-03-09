@@ -21,5 +21,14 @@ jobs:
       - name: Install dependencies
         run: uv sync --all-extras
 
+      - name: Cache pre-commit
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pre-commit
+          # The cache key changes if your config changes
+          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
+          restore-keys: |
+            pre-commit-${{ runner.os }}-
+
       - name: Run all checks via pre-commit
         run: uv run pre-commit run --all-files

@@ -1,0 +1,23 @@
+name: Auto-fix Linting Issues
+
+on: [pull_request]
+
+jobs:
+  auto-fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Crucial: uses the PR branch, not the main branch
+          ref: ${{ github.head_ref }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Run pre-commit and auto-fix
+        uses: pre-commit/action@v3.0.1
+        with:
+          # This tells the action to commit fixes back to the PR
+          extra_args: --all-files
