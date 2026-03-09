@@ -37,8 +37,7 @@ def get_status_dir() -> Path:
     if config is None:
         sys.exit(1)
 
-    user_home = Path.home()
-    status_dir = config.get_path("status-dir", user_home)
+    status_dir = config.get_path("status-dir")
 
     # Ensure the status directory exists
     status_dir.mkdir(parents=True, exist_ok=True)

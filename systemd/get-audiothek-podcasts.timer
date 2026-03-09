@@ -1,0 +1,11 @@
+[Unit]
+Description=Get Podcasts once a week
+
+[Timer]
+Unit=get-audiothek-podcasts.service
+OnCalendar=weekly
+Persistent=true
+RandomizedDelaySec=2h
+
+[Install]
+WantedBy=timers.target

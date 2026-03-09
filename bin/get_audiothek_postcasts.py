@@ -14,7 +14,7 @@ from jsonpath_ng import parse as jp_parse
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-# Add the project root to sys.path
+# Add the project root to sys.path, so that our libraries can be loaded
 project_root = Path(__file__).resolve().parent.parent
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
@@ -22,6 +22,10 @@ if str(project_root) not in sys.path:
 
 from lib.configuration import load_and_validate_config
 from lib.download import download_file
+
+# -----------------------------------------------------------------------------
+# Setup
+# -----------------------------------------------------------------------------
 
 # Configure the retry strategy
 retry_strategy = Retry(
@@ -37,15 +41,25 @@ retry_strategy = Retry(
     ],  # Also retry on these server errors
 )
 
+# -----------------------------------------------------------------------------
+# Additional configuration
+# -----------------------------------------------------------------------------
 
-SERVICE_NAME = "download-podcasts"
+SERVICE_NAME = "get-audiothek-podcasts"
 
 PODCAST_TEMPLATE = "https://api.ardaudiothek.de/programsets/{podcast_urn}"
 EPISODE_QUERY = jp_parse("$.data.programSet.items.nodes[*]")
 
+# -----------------------------------------------------------------------------
+# Type definitions
+# -----------------------------------------------------------------------------
 
 type PodcastMetadata = dict[str, dict[str, str]]
 type EpisodeManifest = dict[str, dict[str, dict[str, str]]]
+
+# -----------------------------------------------------------------------------
+# Helper functions
+# -----------------------------------------------------------------------------
 
 
 def get_service_base(service_base: str) -> Path:
@@ -77,6 +91,11 @@ def atomic_write_json(file_path: Path, data: dict[str, Any]) -> None:
     except Exception:
         os.remove(temp_path)
         raise
+
+
+# -----------------------------------------------------------------------------
+# Helper functions
+# -----------------------------------------------------------------------------
 
 
 def process_podcast(
