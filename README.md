@@ -27,10 +27,12 @@ There is a special placeholder `{HOME}` -- representing the user's home director
 
 The `Configuration` class will be trying to resolve these recursive/nested paths until the value either represents a simple string or a referenced key cannot be found. In the latter case, an exception will be thrown.
 
-### Required Configuration Keys
+### Configuration Keys
 
 | Key | Type | Service | Description |
 | --- | --- | --- | --- |
 | `version` | `number` | | Required. Must be value `2`. Otherwise, the schema will not be recognised. |
-| `photo-inbox` | Path | `photo-processor` | Represents the directory in which photos will be discovered. Photos will be moved to `{photo-storage}/<year>` where `<year>` represents the year the photo was taken. |
-| `photo-storage` | Path | `photo-processor` | Represents the base directory in which photos will be stored. The photo processor will create sub-directories representing the year the photo was taken. |
+| `service-base-dir` | `Path` | | Required. Represents the directory where any service can store their data. |
+| `photo-inbox` | `Path` | `photo-processor` | Represents the directory in which photos will be discovered. Photos will be moved to `{photo-storage}/<year>` where `<year>` represents the year the photo was taken. |
+| `photo-storage` | `Path` | `photo-processor` | Represents the base directory in which photos will be stored. The photo processor will create sub-directories representing the year the photo was taken. |
+| `podcast-storage` | `Path` | `download-podcasts` | Represents the base directory in which podcasts will be stored. |

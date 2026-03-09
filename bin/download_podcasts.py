@@ -23,12 +23,6 @@ if str(project_root) not in sys.path:
 from lib.configuration import load_and_validate_config
 from lib.download import download_file
 
-json_env_file = project_root / ".env.json"
-
-config = load_and_validate_config(json_env_file, ["storage-dir"])
-if config is None:
-    sys.exit(1)
-
 # Configure the retry strategy
 retry_strategy = Retry(
     total=5,  # Total attempts (initial + 4 retries)
@@ -46,18 +40,20 @@ retry_strategy = Retry(
 
 SERVICE_NAME = "download-podcasts"
 
-SERVICE_PATH = Path.home() / ".achterhus" / "services" / SERVICE_NAME
-
-CONFIG_PATH = (SERVICE_PATH / "config.json").resolve()
-MANIFEST_PATH = (SERVICE_PATH / "manifest.json").resolve()
-
 PODCAST_TEMPLATE = "https://api.ardaudiothek.de/programsets/{podcast_urn}"
-
 EPISODE_QUERY = jp_parse("$.data.programSet.items.nodes[*]")
 
 
-type Config = dict[str, dict[str, str]]
-type Manifest = dict[str, dict[str, dict[str, str]]]
+type PodcastMetadata = dict[str, dict[str, str]]
+type EpisodeManifest = dict[str, dict[str, dict[str, str]]]
+
+
+def get_service_base(service_base: str) -> Path:
+    return (Path(service_base) / SERVICE_NAME).resolve()
+
+
+def get_service_file_path(service_base: str, file_name: str) -> Path:
+    return (Path(get_service_base(service_base) / file_name)).resolve()
 
 
 def slugify(text: str) -> str:
@@ -83,41 +79,18 @@ def atomic_write_json(file_path: Path, data: dict[str, Any]) -> None:
         raise
 
 
-def extract_episodes(json_data: Any) -> list[dict[str, str]]:
-    results = []
-
-    for match in EPISODE_QUERY.find(json_data):
-        episode = match.value
-        urn = episode.get("publicationId")
-        title = episode.get("title", "Unknown Title")
-        # date_str = episode.get("publicationStartDateAndTime", "")
-
-        # Logic to handle the null downloadUrl
-        audio_list = episode.get("audios", [])
-        if not audio_list:
-            continue
-
-        # Prioritise downloadUrl, fallback to url
-        primary_audio = audio_list[0]
-        download_url = primary_audio.get("downloadUrl") or primary_audio.get(
-            "url"
-        )
-
-        results.append({"urn": urn, "url": download_url, "title": title})
-
-    return results
-
-
-def process_podcast(podcast_urn: str, download_dir: Path) -> None:
+def process_podcast(
+    podcast_urn: str, download_dir: Path, manifest_path: Path
+) -> None:
     download_url = PODCAST_TEMPLATE.format(podcast_urn=podcast_urn)
 
     download_dir.mkdir(exist_ok=True, parents=True)
 
     # Load Manifest
-    manifest: Manifest = {}
-    if MANIFEST_PATH.exists():
-        print(f"Loading manifest from {MANIFEST_PATH}...")
-        with open(MANIFEST_PATH, encoding="utf-8") as f:
+    manifest: EpisodeManifest = {}
+    if manifest_path.exists():
+        print(f"Loading manifest from {manifest_path}...")
+        with open(manifest_path, encoding="utf-8") as f:
             manifest = json.load(f)
 
     if podcast_urn not in manifest:
@@ -186,28 +159,43 @@ def process_podcast(podcast_urn: str, download_dir: Path) -> None:
                     "synopsis": synopsis,
                     "downloaded_at": datetime.now().isoformat(),
                 }
-                atomic_write_json(MANIFEST_PATH, manifest)
+                atomic_write_json(manifest_path, manifest)
             except Exception as e:
                 print(f"Failed to download {episode_urn}: {e}")
 
 
-def main() -> None:
-    config: Config = {}
-    if not CONFIG_PATH.exists():
-        print("No configuration file found. Exiting...")
-        return
+def main() -> int:
+    json_env_file = project_root / ".env.json"
 
-    print(f"Loading config from {CONFIG_PATH}")
-    with open(CONFIG_PATH, encoding="utf-8") as f:
-        config = json.load(f)
+    config = load_and_validate_config(
+        json_env_file, ["podcast-storage", "service-base-dir"]
+    )
+    if config is None:
+        return 1
 
-    for urn, metadata in config.items():
-        download_dir = (
-            Path("/mnt/storage/audio/podcasts") / metadata["target_dir"]
-        ).resolve()
+    service_base = config.get("service-base-dir")
+    storage_base = config.get("podcast-storage")
 
-        process_podcast(urn, download_dir)
+    metadata_path = get_service_file_path(service_base, "metadata.json")
+
+    podcast_metadata: PodcastMetadata = {}
+    if not metadata_path.exists():
+        print("No metadata file found. Exiting...")
+        return 1
+
+    print(f"Loading metadata from {metadata_path}")
+    with open(metadata_path, encoding="utf-8") as f:
+        podcast_metadata = json.load(f)
+
+    manifest_path = get_service_file_path(service_base, "manifest.json")
+
+    for urn, metadata in podcast_metadata.items():
+        download_dir = (Path(storage_base) / metadata["target_dir"]).resolve()
+
+        process_podcast(urn, download_dir, manifest_path)
+
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
