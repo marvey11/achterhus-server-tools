@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main ]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lint-and-typecheck:
     runs-on: ubuntu-latest
@@ -18,17 +22,20 @@ jobs:
           enable-cache: true
           python-version: "3.12"
 
+      - name: Check if uv.lock is out of sync
+        # This will fail the CI immediately if pyproject.toml and uv.lock don't match
+        run: uv lock --check
+
       - name: Install dependencies
-        run: uv sync --all-extras
+        run: uv sync --all-extras --frozen
 
       - name: Cache pre-commit
         uses: actions/cache@v4
         with:
           path: ~/.cache/pre-commit
-          # The cache key changes if your config changes
-          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
+          key: pre-commit-${{ runner.os }}-py3.12-${{ hashFiles('.pre-commit-config.yaml') }}
           restore-keys: |
-            pre-commit-${{ runner.os }}-
+            pre-commit-${{ runner.os }}-py3.12-
 
       - name: Run all checks via pre-commit
         run: uv run pre-commit run --all-files
