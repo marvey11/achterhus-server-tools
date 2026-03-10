@@ -1,5 +1,48 @@
 # Achterhus Server Tools
 
+## 🚀 Deployment & Setup
+
+This project uses **`uv`** for Python dependency management.
+
+See their [GitHub page](https://github.com/astral-sh/uv) for more information.
+
+### Prerequisites
+
+Ensure `uv` is installed on the host:
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+### Environment Configuration
+
+The project uses a JSON-based "Source of Truth" for configuration.
+
+1. Create `.env.json` in the root directory (refer to `.env.json.example`).
+2. Run the generator to create the Bash-compatible `.env` file:
+
+```bash
+uv run generate-env
+```
+
+See below for more details on the JSON configuration.
+
+### Installation
+
+Install the project in "editable" mode to enable the command-line entry points:
+
+```bash
+uv sync --all-extras
+```
+
+### Systemd Automation
+
+Run the following command from the project root to install the `systemd` service and timer units for any of the services:
+
+```bash
+./bin/install-service.sh <service-name>
+```
+
 ## Configuration -- the `.env.json` File
 
 ### General Considerations
