@@ -6,7 +6,7 @@ This project uses **`uv`** for Python dependency management.
 
 See their [GitHub page](https://github.com/astral-sh/uv) for more information.
 
-### Prerequisites
+### Prerequisites and Installation
 
 Ensure `uv` is installed on the host:
 
@@ -14,25 +14,23 @@ Ensure `uv` is installed on the host:
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-### Environment Configuration
-
-The project uses a JSON-based "Source of Truth" for configuration.
-
-1. Create `.env.json` in the root directory (refer to `.env.json.example`).
-2. Run the generator to create the Bash-compatible `.env` file:
-
-```bash
-uv run generate-env
-```
-
-See below for more details on the JSON configuration.
-
-### Installation
-
 Install the project in "editable" mode to enable the command-line entry points:
 
 ```bash
 uv sync --all-extras
+```
+
+Use a virtual environment to avoid installing any dependencies in the host system.
+
+### Environment Configuration
+
+The project uses a JSON-based "Source of Truth" for configuration.
+
+1. Create `.env.json` in the root directory (see below for more details on the JSON configuration).
+2. Run the generator to create the Bash-compatible `.env` file:
+
+```bash
+./bin/generate-env.py
 ```
 
 ### Systemd Automation
