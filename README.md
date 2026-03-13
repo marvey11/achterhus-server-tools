@@ -74,6 +74,8 @@ The `Configuration` class will be trying to resolve these recursive/nested paths
 | --- | --- | --- | --- |
 | `version` | `number` | | Required. Must be value `2`. Otherwise, the schema will not be recognised. |
 | `service-base-dir` | `Path` | | Required. Represents the directory where any service can store their data. |
+| `document-inbox` | `Path` | `document-processor` | Represents the directory in which documents will be discovered. Documents will be moved to a sub-directory in `{document-storage}`. |
+| `document-storage` | `Path` | `document-processor` | Represents the base directory in which documents will be stored. |
 | `photo-inbox` | `Path` | `photo-processor` | Represents the directory in which photos will be discovered. Photos will be moved to `{photo-storage}/<year>` where `<year>` represents the year the photo was taken. |
 | `photo-storage` | `Path` | `photo-processor` | Represents the base directory in which photos will be stored. The photo processor will create sub-directories representing the year the photo was taken. |
 | `podcast-storage` | `Path` | `download-podcasts` | Represents the base directory in which podcasts will be stored. |
