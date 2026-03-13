@@ -1,0 +1,8 @@
+# Enable following 'source' statements even if they aren't specified as input
+external-sources=true
+
+# Add the lib directory to the search path for sourced files
+source-path=lib
+
+# Optional: If you have nested libs, you can add multiple paths
+# source-path=lib:lib/helpers:lib/plugins

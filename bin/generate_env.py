@@ -16,6 +16,8 @@ def main() -> None:
 
     # Define the keys we expect to exist in the JSON
     required_keys = [
+        "document-inbox",
+        "document-storage",
         "photo-inbox",
         "photo-storage",
         "podcast-storage",
@@ -33,6 +35,8 @@ def main() -> None:
         env_config = {
             "SERVICE_BASE_DIR": str(config.get_path("service-base-dir")),
             "SERVICE_STATUS_DIR": str(config.get_path("status-dir")),
+            "DOCUMENT_INBOX": str(config.get_path("document-inbox")),
+            "DOCUMENT_STORAGE": str(config.get("document-storage")),
             "PHOTO_INBOX": str(config.get_path("photo-inbox")),
             "PHOTO_STORAGE": str(config.get("photo-storage")),
             "PODCAST_STORAGE": str(config.get_path("podcast-storage")),
