@@ -33,7 +33,7 @@ function process_comdirect() {
         Buchungsanzeige* | Dividendengutschrift* | Erträgnisgutschrift* | Wertpapierabrechnung* | Steuermitteilung*)
             # --- NORMALISATION ---
             clean="${file//_WKN_/_}"
-            clean=$(echo "$clean" | sed -E 's/([A-Z0-9]{6})\(/\1_(/g')
+            clean=$(sed -E 's/([A-Z0-9]{6})\(/\1_(/g' <<< "$clean")
 
             # --- EXTRACTION ---
             if [[ "$clean" =~ _vom_([0-9]{2})\.([0-9]{2})\.([0-9]{4}) ]]; then
