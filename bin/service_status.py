@@ -15,6 +15,8 @@ if str(project_root) not in sys.path:
 
 from lib.configuration import load_and_validate_config
 
+SERVICE_NAME = "service-status"
+
 
 @dataclass
 class MetadataEntry:
@@ -30,19 +32,20 @@ class MetadataEntry:
 type ServiceMetadata = dict[str, MetadataEntry]
 
 
-def get_status_dir() -> Path:
+def get_service_share_dir() -> Path:
     json_env_file = project_root / ".env.json"
 
-    config = load_and_validate_config(json_env_file, ["status-dir"])
+    config = load_and_validate_config(json_env_file, ["service-shared-dir"])
     if config is None:
         sys.exit(1)
 
-    status_dir = config.get_path("status-dir")
+    shared_base_dir = config.get_path("service-shared-dir")
+    service_share = shared_base_dir / SERVICE_NAME
 
-    # Ensure the status directory exists
-    status_dir.mkdir(parents=True, exist_ok=True)
+    # Ensure the service share directory exists
+    service_share.mkdir(parents=True, exist_ok=True)
 
-    return status_dir
+    return service_share
 
 
 def report_status(
@@ -112,7 +115,7 @@ def main() -> None:
     parser.add_argument("--metadata", type=str, help="JSON string of metadata")
 
     args = parser.parse_args()
-    status_dir = get_status_dir()
+    status_dir = get_service_share_dir()
 
     # Convert the JSON string into MetadataEntry objects
     try:

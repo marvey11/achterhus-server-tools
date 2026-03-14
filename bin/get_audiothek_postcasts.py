@@ -62,14 +62,6 @@ type EpisodeManifest = dict[str, dict[str, dict[str, str]]]
 # -----------------------------------------------------------------------------
 
 
-def get_service_base(service_base: str) -> Path:
-    return (Path(service_base) / SERVICE_NAME).resolve()
-
-
-def get_service_file_path(service_base: str, file_name: str) -> Path:
-    return (Path(get_service_base(service_base) / file_name)).resolve()
-
-
 def slugify(text: str) -> str:
     """Returns a filesystem-friendly version of a string."""
     return re.sub(r"[^\w\s-]", "", text).strip().replace(" ", "_")
@@ -183,33 +175,53 @@ def process_podcast(
                 print(f"Failed to download {episode_urn}: {e}")
 
 
-def main() -> int:
+def get_configuration_paths() -> tuple[Path, Path]:
     json_env_file = project_root / ".env.json"
 
     config = load_and_validate_config(
-        json_env_file, ["podcast-storage", "service-base-dir"]
+        json_env_file, ["podcast-storage", "service-shared-dir"]
     )
-    if config is None:
-        return 1
 
-    service_base = config.get("service-base-dir")
+    if config is None:
+        raise ValueError("Failed to load configuration")
+
+    service_shared_dir = config.get_path("service-shared-dir")
     storage_base = config.get("podcast-storage")
 
-    metadata_path = get_service_file_path(service_base, "metadata.json")
+    return service_shared_dir, storage_base
 
-    podcast_metadata: PodcastMetadata = {}
+
+def get_service_file_paths(service_shared_dir: Path) -> tuple[Path, Path]:
+    shared_path = (service_shared_dir / SERVICE_NAME).resolve()
+    shared_path.mkdir(exist_ok=True, parents=True)
+
+    metadata_path = (shared_path / "metadata.json").resolve()
+    manifest_path = (shared_path / "manifest.json").resolve()
+
+    return metadata_path, manifest_path
+
+
+def main() -> int:
+    try:
+        service_shared_dir, storage_base = get_configuration_paths()
+    except ValueError as e:
+        print(f"Failed to retrieve configuration paths: {e}")
+        return 1
+
+    metadata_path, manifest_path = get_service_file_paths(service_shared_dir)
+
     if not metadata_path.exists():
         print("No metadata file found. Exiting...")
         return 1
+
+    podcast_metadata: PodcastMetadata = {}
 
     print(f"Loading metadata from {metadata_path}")
     with open(metadata_path, encoding="utf-8") as f:
         podcast_metadata = json.load(f)
 
-    manifest_path = get_service_file_path(service_base, "manifest.json")
-
     for urn, metadata in podcast_metadata.items():
-        download_dir = (Path(storage_base) / metadata["target_dir"]).resolve()
+        download_dir = (storage_base / metadata["target_dir"]).resolve()
 
         process_podcast(urn, download_dir, manifest_path)
 

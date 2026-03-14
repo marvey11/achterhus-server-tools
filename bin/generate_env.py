@@ -21,8 +21,8 @@ def main() -> None:
         "photo-inbox",
         "photo-storage",
         "podcast-storage",
-        "status-dir",
         "service-base-dir",
+        "service-shared-dir",
     ]
 
     config = load_and_validate_config(json_env_file, required_keys)
@@ -34,7 +34,7 @@ def main() -> None:
         # Ensure Path objects are stringified correctly before quoting
         env_config = {
             "SERVICE_BASE_DIR": str(config.get_path("service-base-dir")),
-            "SERVICE_STATUS_DIR": str(config.get_path("status-dir")),
+            "SERVICE_SHARED_DIR": str(config.get_path("service-shared-dir")),
             "DOCUMENT_INBOX": str(config.get_path("document-inbox")),
             "DOCUMENT_STORAGE": str(config.get("document-storage")),
             "PHOTO_INBOX": str(config.get_path("photo-inbox")),
