@@ -16,11 +16,14 @@ def main() -> None:
 
     # Define the keys we expect to exist in the JSON
     required_keys = [
+        "database-archive",
         "document-inbox",
         "document-storage",
         "photo-inbox",
         "photo-storage",
         "podcast-storage",
+        "postgres-user",
+        "postgres-database",
         "service-base-dir",
         "service-shared-dir",
     ]
@@ -33,13 +36,16 @@ def main() -> None:
         # Mapping: BASH_VAR_NAME -> config_key (resolved)
         # Ensure Path objects are stringified correctly before quoting
         env_config = {
-            "SERVICE_BASE_DIR": str(config.get_path("service-base-dir")),
-            "SERVICE_SHARED_DIR": str(config.get_path("service-shared-dir")),
-            "DOCUMENT_INBOX": str(config.get_path("document-inbox")),
+            "SERVICE_BASE_DIR": str(config.get("service-base-dir")),
+            "SERVICE_SHARED_DIR": str(config.get("service-shared-dir")),
+            "DOCUMENT_INBOX": str(config.get("document-inbox")),
             "DOCUMENT_STORAGE": str(config.get("document-storage")),
-            "PHOTO_INBOX": str(config.get_path("photo-inbox")),
+            "PHOTO_INBOX": str(config.get("photo-inbox")),
             "PHOTO_STORAGE": str(config.get("photo-storage")),
-            "PODCAST_STORAGE": str(config.get_path("podcast-storage")),
+            "PODCAST_STORAGE": str(config.get("podcast-storage")),
+            "DATABASE_ARCHIVE": str(config.get("database-archive")),
+            "POSTGRES_USER": config.get("postgres-user"),
+            "POSTGRES_DB": config.get("postgres-database"),
         }
     except KeyError as e:
         print(f"❌ Resolution Error: {e}", file=sys.stderr)

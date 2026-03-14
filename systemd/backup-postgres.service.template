@@ -1,0 +1,15 @@
+[Unit]
+Description=Daily Backup of the PostgreSQL Database
+After=network.target
+
+[Service]
+Type=oneshot
+WorkingDirectory={{PROJECT_ROOT}}
+ExecStart={{PROJECT_ROOT}}/bin/backup-postgres.sh
+
+# can't use variables from the config here, but substitutions still work...
+StandardOutput=append:%h/.achterhus/services/log/%N.log
+StandardError=append:%h/.achterhus/services/log/%N.log
+
+[Install]
+WantedBy=default.target
