@@ -80,3 +80,6 @@ The `Configuration` class will be trying to resolve these recursive/nested paths
 | `photo-inbox` | `Path` | `photo-processor` | Represents the directory in which photos will be discovered. Photos will be moved to `{photo-storage}/<year>` where `<year>` represents the year the photo was taken. |
 | `photo-storage` | `Path` | `photo-processor` | Represents the base directory in which photos will be stored. The photo processor will create sub-directories representing the year the photo was taken. |
 | `podcast-storage` | `Path` | `download-podcasts` | Represents the base directory in which podcasts will be stored. |
+| `database-archive` | `Path` | `backup-postgres` | Directory where database backups will be stored. |
+| `postgres-user` | `string` | `backup-postgres` | Will be set as the `POSTGRES_USER` environment variable. |
+| `postgres-database` | `string` | `backup-postgres` | Will be set as the `POSTGRES_DB` environment variable. |
