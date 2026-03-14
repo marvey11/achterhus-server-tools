@@ -2,8 +2,10 @@
 Description=Run Achterhus Backup Daily
 
 [Timer]
-OnCalendar=*-*-* 03:11:00
+Unit=backup-drives.service
+OnCalendar=*-*-* 03:00:00
+RandomizedDelaySec=2h
 Persistent=true
 
 [Install]
-WantedBy=default.target
+WantedBy=timers.target

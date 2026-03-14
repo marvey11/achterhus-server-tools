@@ -3,9 +3,9 @@ Description=Get Podcasts once a week
 
 [Timer]
 Unit=get-audiothek-podcasts.service
-OnCalendar=weekly
-Persistent=true
+OnCalendar=daily
 RandomizedDelaySec=2h
+Persistent=true
 
 [Install]
 WantedBy=timers.target

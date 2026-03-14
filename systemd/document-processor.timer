@@ -4,8 +4,8 @@ Description=Run Document Processor every night
 [Timer]
 Unit=document-processor.service
 OnCalendar=daily
-Persistent=true
 RandomizedDelaySec=2h
+Persistent=true
 
 [Install]
-WantedBy=timer.target
+WantedBy=timers.target
