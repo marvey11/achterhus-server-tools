@@ -1,5 +1,5 @@
 [Unit]
-Description=Run Photo Processor every 6 hours
+Description=Run Photo Processor every night
 
 [Timer]
 Unit=photo-processor.service

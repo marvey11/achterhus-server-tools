@@ -1,5 +1,5 @@
 [Unit]
-Description=Get Podcasts once a week
+Description=Get Podcasts during the night
 
 [Timer]
 Unit=get-audiothek-podcasts.service

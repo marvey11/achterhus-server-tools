@@ -10,31 +10,22 @@ Create the user-level `systemd` folder:
 mkdir -p ~/.config/systemd/user
 ```
 
-Symlink all the service and timer files into that newly created directory.
+Run the `install-service.sh` script with the service name as the argument.
 
 ```shell
-ln -s ~/achterhus-nas-tools/services/backup-drives.service ~/.config/systemd/user/backup-drives.service
-ln -s ~/achterhus-nas-tools/services/backup-drives.timer ~/.config/systemd/user/backup-drives.timer
+./bin/install-service.sh backup-drives
 ```
 
-Subsequently, the daemon needs to be reloaded. This ensures that all services are reloaded as well.
+This script expects both a `<service-name>.service.template` and a `<service-name>.timer` file in the `systemd` directory inside this repository. It will take care of variable substitution in the service template and install both the generared service unit and the timer unit in `~/.config/systemd/user`.
 
-```shell
-systemctl --user daemon-reload
-```
+The script will also take care of running all the necessary commands, like `systemctl --user daemon-reload` and enabling the timer. It will also run some sanity checks on the unit files.
 
-This also applied if any of the service or timer files has been modified.
+## Useful Service Commands
 
-Services can be run manually b simply specifying the `start` command:
+Services can be run manually by simply specifying the `start` command:
 
 ```shell
 systemctl --user start backup-drives.service
-```
-
-Timers need to be enabled separately.
-
-```shell
-systemctl --user enable --now backup-drives.timer
 ```
 
 To find out whether the timer was installed correctly, the list of currently active timers can e queried.
