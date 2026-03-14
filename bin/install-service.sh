@@ -40,14 +40,15 @@ sed "s|{{PROJECT_ROOT}}|${PROJECT_ROOT}|g" \
 TIMER_SRC="systemd/${SERVICE_NAME}.timer"
 cp "${TIMER_SRC}" "${SYSTEMD_DIR}/"
 
+echo "🔍 Performing sanity check on ${SERVICE_NAME}..."
+# Ask systemd to verify the unit file syntax
+systemd-analyze verify --user "${SERVICE_NAME}.service"
+systemd-analyze verify --user "${SERVICE_NAME}.timer"
+
 # Reload systemd and enable the timer
 systemctl --user daemon-reload
 systemctl --user enable --now "${SERVICE_NAME}.timer"
 echo "⏰ Timer enabled: ${SERVICE_NAME}.timer"
-
-echo "🔍 Performing sanity check on ${SERVICE_NAME}..."
-# Ask systemd to verify the unit file syntax
-systemd-analyze verify --user "${SERVICE_NAME}.service"
 
 echo "✅ Installation complete!"
 echo "📡 Monitoring: systemctl --user status ${SERVICE_NAME}.timer"
