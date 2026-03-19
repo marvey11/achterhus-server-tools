@@ -16,6 +16,7 @@ def main() -> None:
 
     # Define the keys we expect to exist in the JSON
     required_keys = [
+        "backup-dir",
         "database-archive",
         "document-inbox",
         "document-storage",
@@ -26,6 +27,7 @@ def main() -> None:
         "postgres-database",
         "service-base-dir",
         "service-shared-dir",
+        "storage-dir",
     ]
 
     config = load_and_validate_config(json_env_file, required_keys)
@@ -37,6 +39,8 @@ def main() -> None:
         # Ensure Path objects are stringified correctly before quoting
         env_config = {
             "SERVICE_BASE_DIR": str(config.get("service-base-dir")),
+            "STORAGE_DIR": str(config.get("storage-dir")),
+            "BACKUP_DIR": str(config.get("backup-dir")),
             "SERVICE_SHARED_DIR": str(config.get("service-shared-dir")),
             "DOCUMENT_INBOX": str(config.get("document-inbox")),
             "DOCUMENT_STORAGE": str(config.get("document-storage")),
