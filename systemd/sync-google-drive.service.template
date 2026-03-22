@@ -1,0 +1,15 @@
+[Unit]
+Description=Google Drive Sync
+After=network.target
+
+[Service]
+Type=oneshot
+WorkingDirectory={{PROJECT_ROOT}}
+ExecStart={{PROJECT_ROOT}}/bin/sync-gdrive.sh
+
+# can't use variables from the config here, but substitutions still work...
+StandardOutput=append:%h/.achterhus/services/log/%N.log
+StandardError=append:%h/.achterhus/services/log/%N.log
+
+[Install]
+WantedBy=default.target
