@@ -85,3 +85,4 @@ The `Configuration` class will be trying to resolve these recursive/nested paths
 | `database-archive` | `Path` | `backup-postgres` | Directory where database backups will be stored. |
 | `postgres-user` | `string` | `backup-postgres` | Will be set as the `POSTGRES_USER` environment variable. |
 | `postgres-database` | `string` | `backup-postgres` | Will be set as the `POSTGRES_DB` environment variable. |
+| `gdrive-source` | `string` | `sync-google-drive` | Will be set as `GDRIVE_SOURCE` used in the `rclone` command. Depends on how the remote is defined in `rclone` and what Google Drive folder to use (if any) |

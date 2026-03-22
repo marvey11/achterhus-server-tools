@@ -20,6 +20,7 @@ def main() -> None:
         "database-archive",
         "document-inbox",
         "document-storage",
+        "gdrive-source",
         "photo-inbox",
         "photo-storage",
         "podcast-storage",
@@ -50,6 +51,7 @@ def main() -> None:
             "DATABASE_ARCHIVE": str(config.get("database-archive")),
             "POSTGRES_USER": config.get("postgres-user"),
             "POSTGRES_DB": config.get("postgres-database"),
+            "GDRIVE_SOURCE": config.get("gdrive-source"),
         }
     except KeyError as e:
         print(f"❌ Resolution Error: {e}", file=sys.stderr)
