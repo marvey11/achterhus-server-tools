@@ -2,7 +2,7 @@
 Description=Sync Google Drive every night
 
 [Timer]
-Unit=document-processor.service
+Unit=sync-gdrive.service
 OnCalendar=daily
 RandomizedDelaySec=1h
 Persistent=true

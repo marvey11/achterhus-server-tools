@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-SERVICE_NAME="photo-processor"
+SERVICE_ID="photo-processor"
 METADATA="{}" # Default to empty JSON object
 
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
@@ -17,7 +17,7 @@ function finish() {
     local exit_code=$?
 
     ${PYTHON_CMD} "${SCRIPT_DIR}/service_status.py" \
-        "${SERVICE_NAME}" \
+        "${SERVICE_ID}" \
         "$exit_code" \
         --metadata "$METADATA"
 
@@ -66,7 +66,7 @@ LOG_OUTPUT=$(exiftool -P -ext jpg -ext jpeg -r -d "${PHOTO_STORAGE}/%Y" \
     '-Directory<${DateTimeOriginal}' \
     "${PHOTO_INBOX}")
 
-COUNT=$(echo "$LOG_OUTPUT" | grep "image files" | awk '{print $1}')
+COUNT=$(echo "$LOG_OUTPUT" | grep "image files" | awk '{print $1}' || true)
 COUNT=${COUNT:-0}
 
 METADATA=$(cat <<EOF

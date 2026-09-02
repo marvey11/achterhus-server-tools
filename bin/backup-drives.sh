@@ -7,7 +7,8 @@ set -euo pipefail
 # SCRIPT CONFIGURATION
 # -----------------------------------------------------------------------------
 
-SERVICE_NAME="backup-drives"
+SERVICE_ID="backup-drives"
+SERVICE_NAME="Backup Storage Drive"
 METADATA="{}" # Default to empty JSON object
 
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
@@ -40,8 +41,9 @@ function finish() {
     fi
 
     ${PYTHON_CMD} "${SCRIPT_DIR}/service_status.py" \
-        "${SERVICE_NAME}" \
+        "${SERVICE_ID}" \
         "$exit_code" \
+        --name "${SERVICE_NAME}" \
         --metadata "$METADATA"
 
     if [ "$exit_code" -ne 0 ]; then
@@ -133,6 +135,7 @@ rsync "${RSYNC_OPTS[@]}" \
     --exclude='lost+found/' \
     --exclude='temp/' \
     --exclude='.deleted/' \
+    --exclude='.is_mounted' \
     "${STORAGE_DIR}/" "${BACKUP_DIR}/" | tee "$STATS_FILE"
 
 # Extract the last 25 lines from the temp file for the metadata

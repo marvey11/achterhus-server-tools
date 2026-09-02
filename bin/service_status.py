@@ -50,8 +50,9 @@ def get_service_share_dir() -> Path:
 
 def report_status(
     status_dir: Path,
-    service_name: str,
+    service_id: str,
     exit_code: int,
+    name: str | None = None,
     metadata: ServiceMetadata | None = None,
 ) -> None:
     utc_now = (
@@ -62,18 +63,21 @@ def report_status(
     )
 
     data: dict[str, Any] = {
-        "service": service_name,
+        "service": service_id,
         "timestamp": utc_now,
         "status": "success" if exit_code == 0 else "error",
         "exit_code": exit_code,
     }
+
+    if name:
+        data["name"] = name
 
     if metadata:
         data["metadata"] = {
             key: value.to_dict() for key, value in metadata.items()
         }
 
-    status_file = status_dir / f"{service_name}.json"
+    status_file = status_dir / f"{service_id}.json"
     try:
         with open(status_file, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=4)
@@ -84,7 +88,7 @@ def report_status(
         print(f"❌ Error writing status file: {e}", file=sys.stderr)
 
 
-def update_manifest(status_dir: Path, service_name: str) -> None:
+def update_manifest(status_dir: Path, service_id: str) -> None:
     manifest_file = status_dir / "services.json"
 
     services: set[str] = set()
@@ -96,8 +100,8 @@ def update_manifest(status_dir: Path, service_name: str) -> None:
         except json.JSONDecodeError:
             pass
 
-    if service_name not in services:
-        services.add(service_name)
+    if service_id not in services:
+        services.add(service_id)
         temp_file = manifest_file.with_suffix(".tmp")
         with open(temp_file, "w", encoding="utf-8") as f:
             json.dump(sorted(list(services)), f, indent=2)
@@ -110,8 +114,9 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="Report service status to a JSON file."
     )
-    parser.add_argument("service_name", help="Name of the service")
+    parser.add_argument("service_id", help="Service ID")
     parser.add_argument("exit_code", type=int, help="Exit code of the service")
+    parser.add_argument("--name", type=str, help="Optional service name")
     parser.add_argument("--metadata", type=str, help="JSON string of metadata")
 
     args = parser.parse_args()
@@ -126,9 +131,13 @@ def main() -> None:
         metadata_dict = None
 
     report_status(
-        status_dir, args.service_name, args.exit_code, metadata=metadata_dict
+        status_dir,
+        args.service_id,
+        args.exit_code,
+        name=args.name,
+        metadata=metadata_dict,
     )
-    update_manifest(status_dir, args.service_name)
+    update_manifest(status_dir, args.service_id)
 
 
 if __name__ == "__main__":

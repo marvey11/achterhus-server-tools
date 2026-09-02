@@ -3,7 +3,7 @@
 set -euo pipefail
 
 # --- CONFIGURATION ---
-SERVICE_NAME="document-processor"
+SERVICE_ID="document-processor"
 METADATA="{}" # Default to empty JSON object
 
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
@@ -17,7 +17,7 @@ function finish() {
     local exit_code=$?
 
     ${PYTHON_CMD} "${SCRIPT_DIR}/service_status.py" \
-        "${SERVICE_NAME}" \
+        "${SERVICE_ID}" \
         "$exit_code" \
         --metadata "$METADATA"
 

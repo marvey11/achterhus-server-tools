@@ -3,7 +3,8 @@
 set -euo pipefail
 
 # Configuration
-SERVICE_NAME="backup-postgres"
+SERVICE_ID="backup-postgres"
+SERVICE_NAME="Backup PostgreSQL Database"
 METADATA="{}" # Default to empty JSON object
 
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
@@ -18,8 +19,9 @@ function finish() {
     local exit_code=$?
 
     ${PYTHON_CMD} "${SCRIPT_DIR}/service_status.py" \
-        "${SERVICE_NAME}" \
+        "${SERVICE_ID}" \
         "$exit_code" \
+        --name "${SERVICE_NAME}" \
         --metadata "$METADATA"
 
     if [ "$exit_code" -ne 0 ]; then

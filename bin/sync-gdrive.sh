@@ -20,7 +20,8 @@ set -euo pipefail
 # SCRIPT CONFIGURATION
 # -----------------------------------------------------------------------------
 
-SERVICE_NAME="sync-google-drive"
+SERVICE_ID="sync-gdrive"
+SERVICE_NAME="Sync Google Drive"
 METADATA="{}" # Default to empty JSON object
 
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
@@ -39,8 +40,9 @@ function finish() {
     local exit_code=$?
 
     ${PYTHON_CMD} "${SCRIPT_DIR}/service_status.py" \
-        "${SERVICE_NAME}" \
+        "${SERVICE_ID}" \
         "$exit_code" \
+        --name "${SERVICE_NAME}" \
         --metadata "$METADATA"
 
     if [ "$exit_code" -ne 0 ]; then
