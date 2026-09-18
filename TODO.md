@@ -7,4 +7,3 @@
   - [ ] Put the executable `bash` scripts in `bin`
   - [ ] Add the Python code under `src` in separate packages (including `core` for common code)
 - [ ] Create a shared library which bundles service-level functionality, like querying its shared directory
-- [ ] Add metadata extraction to `get-audiothek-podcasts.py`
