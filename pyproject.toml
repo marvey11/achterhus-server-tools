@@ -2,10 +2,7 @@
 name = "achterhus-server-tools"
 version = "0.1.0"
 requires-python = ">=3.12"
-dependencies = [
-    "jsonpath-ng",
-    "requests",
-]
+dependencies = []
 
 [project.optional-dependencies]
 dev = [
@@ -13,7 +10,6 @@ dev = [
     "ruff",
     "pre-commit",
     "shellcheck-py",
-    "types-requests",
 ]
 
 [tool.setuptools.packages.find]
@@ -59,11 +55,6 @@ disallow_untyped_defs = true
 check_untyped_defs = true
 warn_return_any = true
 warn_unused_ignores = true
-
-[[tool.mypy.overrides]]
-# For libraries that don't have type hints, ignore their missing stubs
-module = "jsonpath_ng.*"
-ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

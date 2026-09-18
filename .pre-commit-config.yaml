@@ -19,8 +19,6 @@ repos:
     rev: v1.19.1
     hooks:
       - id: mypy
-        # Tell pre-commit to install the types needed
-        additional_dependencies: [types-requests, jsonpath-ng]
 
   # Shellcheck via the pre-commit mirror
   - repo: https://github.com/koalaman/shellcheck-precommit
