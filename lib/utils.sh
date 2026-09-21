@@ -39,3 +39,23 @@ function move_and_verify() {
         return 1
     fi
 }
+
+function generate_uuid() {
+    if command -v uuidgen >/dev/null 2>&1; then
+        uuidgen
+    elif [ -r /proc/sys/kernel/random/uuid ]; then
+        cat /proc/sys/kernel/random/uuid
+    else
+        jq -rn '
+            [range(16)] | map(if . == 6 then (random * 16 | floor | . % 16 | . + 64)
+                              elif . == 8 then (random * 16 | floor | . % 4 | . + 128)
+                              else (random * 256 | floor) end)
+            | map(if . < 16 then "0" else "" end + tostring) | join("")
+            | "\(.[0:8])-\(.[8:12])-\(.[12:16])-\(.[16:20])-\(.[20:32])"
+        '
+    fi
+}
+
+function get_iso8601() {
+    date -u +"%Y-%m-%dT%H:%M:%SZ"
+}
