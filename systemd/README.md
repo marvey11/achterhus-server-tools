@@ -10,22 +10,24 @@ Create the user-level `systemd` folder:
 mkdir -p ~/.config/systemd/user
 ```
 
-Run the `install-service.sh` script with the service name as the argument.
+Run the `install-systemd.sh` script with the service name as the argument.
 
 ```shell
-./bin/install-service.sh backup-drives
+./scripts/install-systemd.sh backup-storage
 ```
 
-This script expects both a `<service-name>.service.template` and a `<service-name>.timer` file in the `systemd` directory inside this repository. It will take care of variable substitution in the service template and install both the generared service unit and the timer unit in `~/.config/systemd/user`.
+This script expects both a `<service-name>.service` and a `<service-name>.timer` file in the `systemd` directory inside this repository. In addition, if the service requires configuration, an example file can be included as `<service-name>.env-example` inside the `systemd` directory.
 
-The script will also take care of running all the necessary commands, like `systemctl --user daemon-reload` and enabling the timer. It will also run some sanity checks on the unit files.
+Both the server and timer units will be sym-linked to `~/.config/systemd/user`.
+
+The script will also take care of running all the necessary commands, like `systemctl --user daemon-reload` and enabling the timer. It will even run some sanity checks on the unit files.
 
 ## Useful Service Commands
 
 Services can be run manually by simply specifying the `start` command:
 
 ```shell
-systemctl --user start backup-drives.service
+systemctl --user start backup-storage.service
 ```
 
 To find out whether the timer was installed correctly, the list of currently active timers can e queried.
