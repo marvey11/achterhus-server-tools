@@ -1,0 +1,14 @@
+[Unit]
+Description=Daily Backup of the Storage Drive
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=%h/.config/achterhus/server-tools/backup-storage.env
+ExecStart=/usr/bin/docker compose \
+    --project-directory ${PROJECT_DIR} \
+    run --rm backup-storage
+
+[Install]
+WantedBy=default.target
