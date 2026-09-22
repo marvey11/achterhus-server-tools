@@ -14,7 +14,7 @@ RUN apk add --no-cache \
 RUN adduser -D -u 1000 appuser
 
 # Make sure the mount point for `rclone.conf` exists and has correct permissions
-RUN mkdir -p /home/appuser/.config/rclone && chown -R appuser:appuser /home/appuser/.config/rclone
+RUN mkdir -p /home/appuser/.config/rclone && chown -R appuser:appuser /home/appuser
 
 WORKDIR /opt/achterhus-server-tools
 
