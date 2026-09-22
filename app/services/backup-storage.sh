@@ -7,7 +7,7 @@ set -euo pipefail
 # -----------------------------------------------------------------------------
 
 readonly SERVICE_ID="backup-storage"
-#readonly SERVICE_NAME="Back up Storage Drive"
+# readonly SERVICE_NAME="Back up Storage Drive"
 
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 readonly SCRIPT_DIR
@@ -16,6 +16,7 @@ PROJECT_ROOT=$(realpath "${SCRIPT_DIR}/../..")
 readonly PROJECT_ROOT
 
 LIB_DIR=${PROJECT_ROOT}/lib
+readonly LIB_DIR
 
 readonly TELEMETRY_URL="${TELEMETRY_URL:-http://telemetry-api:8000}"
 
@@ -47,12 +48,12 @@ source "${LIB_DIR}/telemetry.sh"
 
 usage() {
     cat <<EOF
-Usage: $(basename "$0") [OPTIONS] -s <source_dir> -t <dest_dir>
+Usage: $(basename "$0") [OPTIONS] -s <source_dir> -d <dest_dir>
 
 Options:
   -s, --source <dir>      Source directory (required)
   -d, --destination <dir> Destination directory (required)
-  -n, --dry-run           Perform a trial run with no changes made (default)
+  -n, --dry-run           Perform a trial run with no changes made
   -h, --help              Display this help message
 EOF
 }
@@ -120,9 +121,9 @@ cleanup_and_report() {
     local error_msg=""
     local logs_summary=""
 
-    if [ "$exit_code" -ne 0 ]; then
+    if [[ "$exit_code" -ne 0 ]]; then
         status="FAILED"
-        if [ -s "$ERROR_LOG" ]; then
+        if [[ -s "$ERROR_LOG" ]]; then
             logs_summary="$(tail -n 10 "$ERROR_LOG" | tr '\n' ' ' | sed 's/"/\\"/g')"
             error_msg="Script terminated with exit code $exit_code. stderr summary: $logs_summary"
         else
@@ -147,7 +148,6 @@ cleanup_and_report() {
 }
 
 trap cleanup_and_report EXIT
-exec 2> >(tee -a "$ERROR_LOG" >&2)
 
 # -----------------------------------------------------------------------------
 # SANITY CHECKS
@@ -175,27 +175,30 @@ run_service() {
     local rsync_opts=(-avhzx --delete --stats)
     if [[ "$DRY_RUN" == true ]]; then
         rsync_opts+=("--dry-run")
-        echo "⚠️  Dry-run enabled. No changes will be made."
+        printf '⚠️  Dry-run enabled. No changes will be made.\n'
     fi
 
-    # `rsync` command execution
-    rsync "${rsync_opts[@]}" \
+    # Execute `rsync` command and capture stdout/stderr output
+    if ! rsync "${rsync_opts[@]}" \
         --exclude='lost+found/' \
         --exclude='temp/' \
         --exclude='.deleted/' \
         --exclude='.is_mounted' \
-        "${SOURCE_DIR}/" "${DEST_DIR}/" | tee "$STATS_FILE"
+        "${SOURCE_DIR}/" "${DEST_DIR}/" 2>&1 | tee "$STATS_FILE" "$ERROR_LOG"; then
+        printf 'Error: rsync operation failed.\n' >&2
+        return 1
+    fi
 
     # Extract the last 25 lines from the temp file for the metadata
     local rsync_log
-    rsync_log=$(tail -n 25 "$STATS_FILE")
+    rsync_log="$(tail -n 25 "$STATS_FILE" | tr -d ',')"
 
     # Parsing `rsync` summary
     local total_size xfer_size
-    total_size=$(echo "${rsync_log}" | grep "total size is" | awk '{print $4}' || true)
-    xfer_size=$(echo "${rsync_log}" | grep "Total transferred file size" | awk '{print $5}' || true)
+    total_size="$(printf '\%s\n' "${rsync_log}" | grep "total size is" | awk '{print $4}' || true)"
+    xfer_size="$(printf '\%s\n' "${rsync_log}" | grep "Total transferred file size" | awk '{print $5}' || true)"
 
-    # Ensure we have fallback strings so the JSON isn't malformed
+    # Ensure fallback strings so the JSON isn't malformed
     local safe_total="${total_size:-unknown}"
     local safe_xfer
 
