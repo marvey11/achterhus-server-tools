@@ -109,9 +109,6 @@ function run_service() {
 
     [[ "$file_count" =~ ^[0-9]+$ ]] || file_count=0
 
-    echo "FILE COUNT: ${file_count}"
-    echo "DATA SENT: $xfer_value $xfer_unit"
-
     METRICS_JSON=$(jq -n \
         --argjson file_count "$file_count" \
         --arg data_sent "$xfer_value $xfer_unit" \
