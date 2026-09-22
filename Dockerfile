@@ -6,6 +6,7 @@ RUN apk add --no-cache \
     ca-certificates \
     curl \
     jq \
+    rclone \
     rsync \
     util-linux
 
