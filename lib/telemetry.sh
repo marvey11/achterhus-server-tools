@@ -1,5 +1,82 @@
 # shellcheck shell=bash
 
+function init_telemetry() {
+    SERVICE_ID="${1:?Service ID required}"
+
+    RUN_ID="$(generate_uuid)"
+    STARTED_AT="$(get_iso8601)"
+    START_TIME="$(date +%s)"
+
+    ERROR_LOG="$(mktemp)"
+    STATS_FILE="$(mktemp)"
+    METRICS_JSON="{}"
+
+    # Default list of exit codes treated as warnings rather than failures
+    ALLOWED_WARN_CODES=()
+
+    export SERVICE_ID RUN_ID STARTED_AT START_TIME ERROR_LOG STATS_FILE METRICS_JSON ALLOWED_WARN_CODES
+
+    trap 'cleanup_and_report' EXIT
+}
+
+# Helper to mark specific exit codes as non-fatal warnings
+function allow_warning_exit_codes() {
+    ALLOWED_WARN_CODES=("$@")
+}
+
+function cleanup_and_report() {
+    local exit_code=$?
+    trap - EXIT
+
+    local ended_at end_time duration_seconds status error_msg logs_summary
+    ended_at="$(get_iso8601)"
+    end_time="$(date +%s)"
+    duration_seconds=$(( end_time - START_TIME ))
+
+    status="SUCCESS"
+    error_msg=""
+    logs_summary=""
+
+    # Check if the exit code is listed in ALLOWED_WARN_CODES
+    local is_warning=false
+    if [[ "$exit_code" -ne 0 ]]; then
+        for code in "${ALLOWED_WARN_CODES[@]}"; do
+            if [[ "$exit_code" -eq "$code" ]]; then
+                is_warning=true
+                break
+            fi
+        done
+
+        if [[ "$is_warning" == true ]]; then
+            status="WARNING"
+            error_msg="Completed with warning (non-fatal exit code $exit_code)."
+        else
+            status="FAILED"
+            if [[ -s "${ERROR_LOG:-}" ]]; then
+                logs_summary="$(tail -n 10 "$ERROR_LOG" | tr '\n' ' ' | sed 's/"/\\"/g')"
+                error_msg="Script terminated with exit code $exit_code. stderr summary: $logs_summary"
+            else
+                error_msg="Script terminated with exit code $exit_code."
+            fi
+        fi
+    fi
+
+    printf '\n[Telemetry] Run status: %s (Duration: %ss)\n' "$status" "$duration_seconds"
+    send_telemetry \
+        "${TELEMETRY_URL:-http://telemetry-api:8000}" \
+        "$SERVICE_ID" \
+        "$RUN_ID" \
+        "$status" \
+        "$STARTED_AT" \
+        "$ended_at" \
+        "$duration_seconds" \
+        "$METRICS_JSON" \
+        "$error_msg" \
+        "$logs_summary" || printf 'Warning: Failed to send telemetry.\n' >&2
+
+    rm -f "${ERROR_LOG:-}" "${STATS_FILE:-}"
+}
+
 function send_telemetry() {
     # Usage: send_telemetry <endpoint_url> <service_name> <run_id> [status] [started_at] [ended_at] [duration_seconds] [metrics_json] [error_message] [logs_summary]
 
