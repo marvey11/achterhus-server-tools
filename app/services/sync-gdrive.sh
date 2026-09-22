@@ -48,6 +48,9 @@ DRY_RUN=false
 # shellcheck source=lib/telemetry.sh
 source "${LIB_DIR}/telemetry.sh"
 
+# shellcheck source=lib/utils.sh
+source "${LIB_DIR}/utils.sh"
+
 # -----------------------------------------------------------------------------
 # USAGE & ARGUMENT PARSING
 # -----------------------------------------------------------------------------
