@@ -4,7 +4,7 @@ Description=Run Achterhus Backup daily
 [Timer]
 Unit=backup-storage.service
 OnCalendar=*-*-* 02:00:00
-RandomizedDelaySec=2h
+RandomizedDelaySec=1h
 Persistent=true
 
 [Install]
