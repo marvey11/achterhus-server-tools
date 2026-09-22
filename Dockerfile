@@ -13,6 +13,9 @@ RUN apk add --no-cache \
 # Create non-root user with UID 1000
 RUN adduser -D -u 1000 appuser
 
+# Make sure the mount point for `rclone.conf` exists and has correct permissions
+RUN mkdir -p /home/appuser/.config/rclone && chown -R appuser:appuser /home/appuser/.config/rclone
+
 WORKDIR /opt/achterhus-server-tools
 
 # Copy app contents (including entrypoint.sh and services/) to /app
@@ -21,9 +24,6 @@ COPY --chown=appuser:appuser app/ ./app/
 
 # Ensure scripts are executable relative to WORKDIR /app
 RUN chmod +x ./app/entrypoint.sh ./app/services/*.sh
-
-# Define volume mount points
-VOLUME ["/mnt/storage", "/mnt/mirror", "/mnt/gdrivesync"]
 
 USER appuser
 
