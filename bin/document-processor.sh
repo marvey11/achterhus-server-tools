@@ -52,9 +52,8 @@ declare -A stats
 stats=()  # Initialize empty stats array
 export stats
 
-# shellcheck source-path=./lib
 LIB_DIR="${PROJECT_ROOT}/lib"
-# shellcheck source=../lib/utils.sh
+# shellcheck source=lib/utils.sh
 source "${LIB_DIR}/utils.sh"
 
 echo "--- Document Processing Started: $(date) ---"
@@ -62,9 +61,9 @@ echo "--- Document Processing Started: $(date) ---"
 PROCESSOR_DIR="${LIB_DIR}/document-processor"
 for proc in "$PROCESSOR_DIR"/*.sh; do
     [ -e "$proc" ] || continue
-    # shellcheck source=../lib/document-processor/comdirect.sh
-    # shellcheck source=../lib/document-processor/ryd.sh
-    # shellcheck source=../lib/document-processor/vodafone.sh
+    # shellcheck source=lib/document-processor/comdirect.sh
+    # shellcheck source=lib/document-processor/ryd.sh
+    # shellcheck source=lib/document-processor/vodafone.sh
     source "$proc"
 done
 

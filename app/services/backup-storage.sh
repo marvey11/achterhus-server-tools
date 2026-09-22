@@ -15,6 +15,8 @@ readonly SCRIPT_DIR
 PROJECT_ROOT=$(realpath "${SCRIPT_DIR}/../..")
 readonly PROJECT_ROOT
 
+LIB_DIR=${PROJECT_ROOT}/lib
+
 readonly TELEMETRY_URL="${TELEMETRY_URL:-http://telemetry-api:8000}"
 
 # Error codes
@@ -30,14 +32,14 @@ DRY_RUN=false
 # IMPORTS
 # -----------------------------------------------------------------------------
 
-# shellcheck source=../../lib/common.sh
-source "${PROJECT_ROOT}/lib/common.sh"
+# shellcheck source=lib/common.sh
+source "${LIB_DIR}/common.sh"
 
-# shellcheck source=../../lib/utils.sh
-source "${PROJECT_ROOT}/lib/utils.sh"
+# shellcheck source=lib/utils.sh
+source "${LIB_DIR}/utils.sh"
 
-# shellcheck source=../../lib/telemetry.sh
-source "${PROJECT_ROOT}/lib/telemetry.sh"
+# shellcheck source=lib/telemetry.sh
+source "${LIB_DIR}/telemetry.sh"
 
 # -----------------------------------------------------------------------------
 # USAGE & ARGUMENT PARSING
