@@ -1,54 +1,19 @@
 # shellcheck shell=bash
 
-# --- Path Validation Utilities ---
+# Standard exit codes across all services
+readonly ERROR_INVALID_ARGS=2
+readonly ERROR_MISSING_DEPENDENCY=3
+readonly ERROR_DIR_VALIDATION=4
 
-# Validates that a directory exists, and is both writable and searchable.
-ensure_writable_dir() {
-    local dir="$1"
-    local label="${2:-Directory}"
+# Resolve project root and lib directories relative to the calling script
+function init_project_paths() {
+    local caller_script="${1:?Script path required}"
 
-    # Check if directory exists
-    if [[ ! -d "$dir" ]]; then
-        echo "❌ Error: $label '$dir' does not exist" >&2
-        return 1
-    fi
+    SCRIPT_DIR="$(dirname "$(readlink -f "$caller_script")")"
+    PROJECT_ROOT="$(realpath "${SCRIPT_DIR}/../..")"
+    LIB_DIR="${PROJECT_ROOT}/lib"
 
-    # Check Permissions: -w (writable), -x (searchable/executable for dirs)
-    if [[ ! -w "$dir" ]]; then
-        echo "❌ Error: $label '$dir' is not writable by current user ($(whoami))" >&2
-        return 1
-    fi
-
-    if [[ ! -x "$dir" ]]; then
-        echo "❌ Error: $label '$dir' is not accessible (missing +x bit)" >&2
-        return 1
-    fi
-
-    return 0
+    export SCRIPT_DIR PROJECT_ROOT LIB_DIR
 }
 
-# Validates that a directory exists, and is mounted.
-ensure_is_mounted() {
-    local dir="$1"
-    local label="${2:-Directory}"
-    local current
-
-
-    if [[ ! -d "$dir" ]]; then
-        echo "❌ Error: $label '$dir' does not exist!" >&2
-        return 1
-    fi
-
-    # Iterates over the directory to be tested and its parents to check if either is a mount point.
-    current="$dir"
-    while [[ "$current" != "/" ]]; do
-        if mountpoint -q "$current"; then
-            # Success! Found the mount point for this path.
-            return 0
-        fi
-        current=$(dirname "$current")
-    done
-
-    echo "❌ Error: $label '$dir' is not mounted!" >&2
-    return 1
-}
+export ERROR_DIR_VALIDATION ERROR_INVALID_ARGS ERROR_MISSING_DEPENDENCY
