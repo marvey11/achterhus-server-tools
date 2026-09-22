@@ -63,7 +63,7 @@ function cleanup_and_report() {
 
     printf '\n[Telemetry] Run status: %s (Duration: %ss)\n' "$status" "$duration_seconds"
     send_telemetry \
-        "${TELEMETRY_URL:-http://telemetry-api:8000}" \
+        "${TELEMETRY_API_URL:-http://telemetry-api:8000}/api/v1/runs" \
         "$SERVICE_ID" \
         "$RUN_ID" \
         "$status" \
