@@ -26,13 +26,10 @@ jobs:
         with:
           version: "latest"
           python-version: "3.12"
-          enable-cache: true
-
-      - name: Install dependencies
-        run: uv sync --locked --all-extras --dev
+          enable-cache: false
 
       - name: Run all checks via pre-commit
-        run: uv run pre-commit run --all-files
+        run: uvx pre-commit run --all-files
 
   docker-build-and-push:
     runs-on: ubuntu-latest

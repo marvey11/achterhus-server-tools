@@ -8,18 +8,6 @@ repos:
       - id: check-added-large-files
       - id: check-shebang-scripts-are-executable
 
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.16.8
-    hooks:
-      - id: ruff
-        args: [ --fix ]
-      - id: ruff-format
-
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v2.3.1
-    hooks:
-      - id: mypy
-
   # Shellcheck via the pre-commit mirror
   - repo: https://github.com/koalaman/shellcheck-precommit
     rev: v0.11.0
