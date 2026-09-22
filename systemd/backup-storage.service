@@ -5,9 +5,10 @@ Wants=network-online.target
 
 [Service]
 Type=oneshot
-EnvironmentFile=%h/.config/achterhus/server-tools/backup-storage.env
+EnvironmentFile=%h/.config/achterhus/server-tools.env
 ExecStart=/usr/bin/docker compose \
     --project-directory ${PROJECT_DIR} \
+    --env-file %h/.config/achterhus/server-tools.env \
     run --rm backup-storage
 
 [Install]
