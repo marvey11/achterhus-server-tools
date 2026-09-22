@@ -1,0 +1,14 @@
+[Unit]
+Description=Daily Google Drive Sync
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=%h/.config/achterhus/server-tools/sync-gdrive.env
+ExecStart=/usr/bin/docker compose \
+    --project-directory ${PROJECT_DIR} \
+    run --rm sync-gdrive
+
+[Install]
+WantedBy=default.target
