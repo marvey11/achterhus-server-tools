@@ -1,5 +1,2 @@
 app/services/service-template.sh
-
-__pycache__
 lib/document-processor/
-lib/*.py
