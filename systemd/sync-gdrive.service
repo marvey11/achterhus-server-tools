@@ -8,6 +8,7 @@ Type=oneshot
 EnvironmentFile=%h/.config/achterhus/server-tools/sync-gdrive.env
 ExecStart=/usr/bin/docker compose \
     --project-directory ${PROJECT_DIR} \
+    --env-file %h/.config/achterhus/server-tools/sync-gdrive.env \
     run --rm sync-gdrive
 
 [Install]
