@@ -26,7 +26,6 @@ jobs:
         with:
           version: "latest"
           python-version: "3.12"
-          enable-cache: true
 
       - name: Run all checks via pre-commit
         run: uvx pre-commit run --all-files
