@@ -14,11 +14,11 @@ SERVICE_NAME="${1}"
 # Resolve repository paths safely
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 SYSTEMD_DIR="$(realpath "${SCRIPT_DIR}/../systemd")"
-CONFIG_DIR="${HOME}/.config/achterhus/server-tools"
+CONFIG_DIR="${HOME}/.config/achterhus"
 USER_SYSTEMD_DIR="${HOME}/.config/systemd/user"
 
-SERVICE_CONFIG="${CONFIG_DIR}/${SERVICE_NAME}.env"
-EXAMPLE_CONFIG="${SYSTEMD_DIR}/${SERVICE_NAME}.env-example"
+SERVICE_CONFIG="${CONFIG_DIR}/server-tools.env"
+EXAMPLE_CONFIG="${SYSTEMD_DIR}/server-tools.env-example"
 
 SERVICE_UNIT="${SYSTEMD_DIR}/${SERVICE_NAME}.service"
 TIMER_UNIT="${SYSTEMD_DIR}/${SERVICE_NAME}.timer"

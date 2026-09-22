@@ -16,7 +16,9 @@ Run the `install-systemd.sh` script with the service name as the argument.
 ./scripts/install-systemd.sh backup-storage
 ```
 
-This script expects both a `<service-name>.service` and a `<service-name>.timer` file in the `systemd` directory inside this repository. In addition, if the service requires configuration, an example file can be included as `<service-name>.env-example` inside the `systemd` directory.
+This script expects both a `<service-name>.service` and a `<service-name>.timer` file in the `systemd` directory inside this repository.
+
+In addition an example `env` file is included as `server-tools.env-example` in the `systemd` directory.
 
 Both the server and timer units will be sym-linked to `~/.config/systemd/user`.
 
