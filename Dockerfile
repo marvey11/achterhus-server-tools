@@ -23,7 +23,7 @@ COPY --chown=appuser:appuser app/ ./app/
 RUN chmod +x ./app/entrypoint.sh ./app/services/*.sh
 
 # Define volume mount points
-VOLUME ["/mnt/storage", "/mnt/mirror"]
+VOLUME ["/mnt/storage", "/mnt/mirror", "/mnt/gdrivesync"]
 
 USER appuser
 
