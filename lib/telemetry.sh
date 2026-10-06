@@ -69,9 +69,6 @@ function cleanup_and_report() {
     fi
 
     printf '\n[Telemetry] Run status: %s (Duration: %ss)\n' "$status" "$duration_seconds"
-    if [[ "$duration_seconds" =~ ^[0-9]+$ ]]; then
-        METRICS_JSON="$(jq --argjson duration "$duration_seconds" '. + {duration_seconds: $duration}' <<<"$METRICS_JSON")"
-    fi
 
     report_telemetry_status "$status" "$error_msg" "$logs_summary" ||
         printf 'Warning: Failed to send telemetry.\n' >&2
