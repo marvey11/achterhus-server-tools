@@ -122,6 +122,7 @@ function main() {
     ensure_writable_dir "${DEST_DIR}" "Backup Drive" || exit "$ERROR_DIR_VALIDATION"
 
     allow_warning_exit_codes "$RSYNC_ERR_VANISHED"
+    start_telemetry
 
     run_service
 }
