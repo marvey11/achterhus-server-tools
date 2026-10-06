@@ -122,8 +122,8 @@ function run_service() {
 }
 
 function main() {
-    init_telemetry "$SERVICE_ID"
     parse_args "$@"
+    init_telemetry "$SERVICE_ID"
 
     check_dependencies curl rclone jq grep awk mktemp mountpoint
 
