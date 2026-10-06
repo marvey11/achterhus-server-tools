@@ -130,6 +130,7 @@ function main() {
     ensure_writable_dir "${RCLONE_CONFIG_DIR}" "rconf config dir" || exit "$ERROR_DIR_VALIDATION"
     ensure_writable_dir "${DEST_DIR}" "Google Drive Sync Destination" || exit "$ERROR_DIR_VALIDATION"
 
+    start_telemetry
     run_service
 }
 

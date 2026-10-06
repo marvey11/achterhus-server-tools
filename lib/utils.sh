@@ -6,7 +6,7 @@ function check_dependencies() {
     for dep in "$@"; do
         if ! command -v "$dep" >/dev/null 2>&1; then
             printf 'Error: Required dependency "%s" is not installed or not in PATH.\n' "$dep" >&2
-            return "$ERROR_MISSING_DEP"
+            return "$ERROR_MISSING_DEPENDENCY"
         fi
     done
 }
