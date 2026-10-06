@@ -1,7 +1,8 @@
 # shellcheck shell=bash
 
 function init_telemetry() {
-    SERVICE_ID="${1:?Service name required}"
+    SERVICE_ID="${1:?Service ID required}"
+
     RUN_ID="${SERVICE_RUN_ID:?SERVICE_RUN_ID must be supplied by the orchestrator}"
     STARTED_AT="$(get_iso8601)"
     START_TIME="$(date +%s)"
