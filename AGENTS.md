@@ -2,6 +2,8 @@
 
 - Implement shell utilities for Bash with `set -euo pipefail` compatible behaviour.
 - Keep shell code clean under strict ShellCheck checks.
+- Run the configured ShellCheck pre-commit hook with
+  `uvx pre-commit run shellcheck --files <script>`.
 - Use British or International English in documentation and user-facing text.
 - Telemetry run IDs are supplied by the Service Orchestrator in `SERVICE_RUN_ID`;
   services must not generate or register replacement runs.
