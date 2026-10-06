@@ -33,7 +33,7 @@ function allow_warning_exit_codes() {
 }
 
 function cleanup_and_report() {
-    local exit_code=$?
+    local exit_code="${1:-$?}"
     trap - EXIT
 
     local status error_msg logs_summary end_time duration_seconds

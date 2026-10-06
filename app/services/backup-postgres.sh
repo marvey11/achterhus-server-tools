@@ -69,10 +69,12 @@ function parse_args() {
 }
 
 function cleanup_backup_tmp_dir() {
+    local exit_code=$?
+
     if [[ -n "$BACKUP_TMP_DIR" ]]; then
         rm -rf -- "$BACKUP_TMP_DIR" || true
     fi
-    cleanup_and_report
+    cleanup_and_report "$exit_code"
 }
 
 # -----------------------------------------------------------------------------
