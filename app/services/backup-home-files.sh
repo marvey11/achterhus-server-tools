@@ -113,7 +113,7 @@ function run_service() {
     run_and_log rsync "${rsync_options[@]}" \
         "${SOURCE_DIR}/" "${DEST_DIR}/" || return 1
 
-    transferred_files="$(awk -F ': ' '/^Number of files transferred:/ {print $2}' "$STATS_FILE" | tail -n 1)"
+    transferred_files="$(awk -F ': ' '/^Number of regular files transferred:/ {print $2}' "$STATS_FILE" | tail -n 1)"
     if [[ ! "$transferred_files" =~ ^[0-9]+$ ]]; then
         printf 'Error: Could not read the rsync transferred-file count.\n' >&2
         return 1
