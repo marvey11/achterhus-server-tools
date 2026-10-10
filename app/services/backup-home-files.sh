@@ -104,7 +104,7 @@ function run_service() {
 
     printf 'Starting %s: %s (RUN_ID: %s)\n' "${SERVICE_NAME}" "$(date)" "$RUN_ID"
 
-    local rsync_options=(-avz --stats --files-from="$FILES_FROM")
+    local rsync_options=(-avrz --stats --files-from="$FILES_FROM")
     if [[ "$DRY_RUN" == true ]]; then
         rsync_options+=(--dry-run)
         printf 'Dry-run enabled. No files will be copied.\n'
