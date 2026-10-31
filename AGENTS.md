@@ -10,3 +10,13 @@
 - Follow the Telemetry API contract documented in
   `../achterhus-documentation/docs/achterhus_telemetry.md` when changing reports.
 - Keep credentials and other secrets out of source files and checked-in examples.
+- Service workers live in `app/services`; the entrypoint discovers executable
+  scripts there by filename. The shared shell helpers live in `lib`.
+- Keep service scripts compatible with the Alpine-based Docker image. Add
+  required runtime packages to `Dockerfile` only when a new dependency is needed.
+- Run repository quality checks with `uvx pre-commit run --all-files`; for a
+  focused ShellCheck run use `uvx pre-commit run shellcheck --files <script>`.
+- The Docker image build in `.github/workflows/ci.yaml` validates packaging.
+- Snapshot workers accept their directories as CLI options. The external
+  orchestrator maps its shared snapshot-root environment variable to both
+  workers and supplies each run's `SERVICE_RUN_ID`.

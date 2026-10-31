@@ -68,7 +68,7 @@ function parse_args() {
 function run_service() {
     printf 'Starting %s: %s (RUN_ID: %s)\n' "${SERVICE_NAME}" "$(date)" "$RUN_ID"
 
-    local rsync_opts=(-avhzx --delete --stats)
+    local rsync_opts=(-avhzxH --delete --stats)
     if [[ "$DRY_RUN" == true ]]; then
         rsync_opts+=("--dry-run")
         printf '⚠️  Dry-run enabled. No changes will be made.\n'
