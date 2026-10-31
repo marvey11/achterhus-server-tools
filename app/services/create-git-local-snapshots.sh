@@ -122,7 +122,7 @@ function run_service() {
     mv -- "$SNAPSHOT_TMP_DIR" "$snapshot_dir"
     SNAPSHOT_TMP_DIR=""
 
-    ln -sfn -- "$snapshot_dir" "$current_snapshot"
+    ln -sfn -- "$timestamp" "$current_snapshot"
     METRICS_JSON="$(jq -n --arg snapshot "$timestamp" '{snapshot: $snapshot}')"
 
     printf '%s Finished: %s\n' "${SERVICE_NAME}" "$(date)"
