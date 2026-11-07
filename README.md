@@ -70,8 +70,9 @@ environment variable.
 
 ## Other workers
 
-`backup-storage` mirrors a mounted storage directory to a mounted backup drive
-and preserves hard links. `backup-home-files` copies paths from a supplied
-files-from list, `backup-postgres` writes compressed database and globals
-dumps, and `sync-gdrive` moves files to a configured Google Drive remote. Each
-worker has its own CLI help and reports lifecycle status through `lib/telemetry.sh`.
+* `backup-storage` mirrors a mounted storage directory to a mounted backup drive and preserves hard links. Its telemetry reports `logical_size` from rsync's total size, `allocated_size` from the destination's human-readable disk usage, and `data_sent` from the transferred file size.
+* `backup-home-files` copies paths from a supplied files-from list.
+* `backup-postgres` writes compressed database and globals .
+* `sync-gdrive` moves files from a configured Google Drive remote.
+
+Each worker has its own CLI help and reports lifecycle status through `lib/telemetry.sh`.
