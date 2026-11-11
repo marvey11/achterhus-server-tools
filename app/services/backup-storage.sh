@@ -87,7 +87,7 @@ function run_service() {
     local total_size xfer_size allocated_size
     total_size="$(printf '%s\n' "${rsync_log}" | grep "total size is" | awk '{print $4}' || true)"
     xfer_size="$(printf '%s\n' "${rsync_log}" | grep "Total transferred file size" | awk '{print $5}' || true)"
-    allocated_size="$(df -Bh -- "${DEST_DIR}" 2>/dev/null | awk 'NR==2 {print $3}')"
+    allocated_size="$(df -B1 -h -- "${DEST_DIR}" 2>/dev/null | awk 'NR==2 {print $3}')"
 
     local safe_total="${total_size:-unknown}"
     local safe_xfer
