@@ -87,7 +87,7 @@ function run_service() {
     local total_size xfer_size allocated_size
     total_size="$(printf '%s\n' "${rsync_log}" | grep "total size is" | awk '{print $4}' || true)"
     xfer_size="$(printf '%s\n' "${rsync_log}" | grep "Total transferred file size" | awk '{print $5}' || true)"
-    allocated_size="$(du -sh -- "${DEST_DIR}" | awk '{print $1}')"
+    allocated_size="$(df -B1 -- "${DEST_DIR}" 2>/dev/null | awk 'NR==2 {print $3}')"
 
     local safe_total="${total_size:-unknown}"
     local safe_xfer
@@ -118,7 +118,7 @@ function main() {
     parse_args "$@"
     init_telemetry "$SERVICE_ID"
 
-    check_dependencies curl rsync jq grep awk du mktemp mountpoint
+    check_dependencies curl rsync jq grep awk df mktemp mountpoint
 
     ensure_is_mounted "${SOURCE_DIR}" "Data Storage" || exit "$ERROR_DIR_VALIDATION"
     ensure_is_mounted "${DEST_DIR}" "Backup Drive" || exit "$ERROR_DIR_VALIDATION"
